@@ -1,6 +1,7 @@
-﻿namespace GitHubActionsDataCollector.GHADtos
+﻿namespace GitHubActionsDataCollector.GitHubActionsApiClient
 {
-    internal class WorkflowRunDto
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "dto object")]
+    public class WorkflowRunDto
     {
         public int id { get; set; }
         public string title { get; set; }

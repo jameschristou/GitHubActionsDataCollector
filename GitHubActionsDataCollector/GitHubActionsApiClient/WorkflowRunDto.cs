@@ -3,7 +3,7 @@
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "dto object")]
     public class WorkflowRunDto
     {
-        public int id { get; set; }
+        public long id { get; set; }
         public string title { get; set; }
         public string conclusion { get; set; }
         public string created_at { get; set; }

@@ -15,7 +15,20 @@ namespace GitHubActionsDataCollector
     {
         public void Process(WorkflowRunDto workflowRun)
         {
-            Console.WriteLine($"WorkflowRunId:{workflowRun.id}");
+            var createdAt = DateTime.Parse(workflowRun.created_at);
+            var updatedAt = DateTime.Parse(workflowRun.updated_at);
+
+            var duration = updatedAt.Subtract(createdAt);
+
+            Console.WriteLine($"WorkflowRunId:{workflowRun.id} Title:{workflowRun.title} Duration:{duration} RunAttempts:{workflowRun.run_attempt} Conclusion:{workflowRun.conclusion}");
+        }
+
+        private bool ShouldProcessWorkflowRun(WorkflowRunDto workflowRun)
+        {
+            if (String.Equals("success", workflowRun.conclusion, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            return false;
         }
     }
 }

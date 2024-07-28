@@ -1,4 +1,6 @@
 ﻿using GitHubActionsDataCollector.GitHubActionsApiClient;
+using GitHubActionsDataCollector.Models;
+using GitHubActionsDataCollector.Repository;
 
 namespace GitHubActionsDataCollector
 {
@@ -13,6 +15,13 @@ namespace GitHubActionsDataCollector
      */
     internal class WorkflowRunProcessor : IWorkflowRunProcessor
     {
+        private readonly IWorkflowRunRepository _workflowRunRepository;
+
+        public WorkflowRunProcessor(IWorkflowRunRepository workflowRunRepository)
+        {
+            _workflowRunRepository = workflowRunRepository;
+        }
+
         public void Process(WorkflowRunDto workflowRun)
         {
             var createdAt = DateTime.Parse(workflowRun.created_at);
@@ -21,6 +30,23 @@ namespace GitHubActionsDataCollector
             var duration = updatedAt.Subtract(createdAt);
 
             Console.WriteLine($"WorkflowRunId:{workflowRun.id} Title:{workflowRun.title} Duration:{duration} RunAttempts:{workflowRun.run_attempt} Conclusion:{workflowRun.conclusion}");
+
+            if (!ShouldProcessWorkflowRun(workflowRun))
+            {
+                Console.WriteLine($"Skipping WorkflowRunId:{workflowRun.id}");
+                return;
+            }
+
+            _workflowRunRepository.SaveWorkflowRun(new WorkflowRunModel
+            {
+                Id = workflowRun.id,
+                DateCompletedUtc = updatedAt,
+                DateStartedUtc = createdAt,
+                Title = workflowRun.title,
+                Conclusion = workflowRun.conclusion,
+                Url = workflowRun.html_url,
+                NumAttempts = workflowRun.run_attempt
+            });
         }
 
         private bool ShouldProcessWorkflowRun(WorkflowRunDto workflowRun)

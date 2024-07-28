@@ -1,5 +1,6 @@
 ﻿using GitHubActionsDataCollector;
 using GitHubActionsDataCollector.GitHubActionsApiClient;
+using GitHubActionsDataCollector.Repository;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -26,6 +27,7 @@ IHostBuilder CreateHostBuilder(string[] strings)
         {
             services.AddTransient<IGitHubActionsApiClient, GitHubActionsApiClient>();
             services.AddTransient<IWorkflowRunProcessor, WorkflowRunProcessor>();
+            services.AddTransient<IWorkflowRunRepository, WorkflowRunRepository>();
             services.AddSingleton<Processor>();
         });
 }

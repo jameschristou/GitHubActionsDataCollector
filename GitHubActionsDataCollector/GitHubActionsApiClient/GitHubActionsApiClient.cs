@@ -11,6 +11,7 @@ namespace GitHubActionsDataCollector.GitHubActionsApiClient
     {
         WorkflowRunListDto GetWorkflowRuns(DateTime fromDate);
         WorkflowRunDto GetWorkflowRun(int workflowRunId);
+        WorkflowRunJobsListDto GetJobsForWorkflowRun(long workflowRunId);
     }
 
     internal class GitHubActionsApiClient : IGitHubActionsApiClient
@@ -221,6 +222,83 @@ namespace GitHubActionsDataCollector.GitHubActionsApiClient
             ";
 
             return JsonSerializer.Deserialize<WorkflowRunListDto>(resultString);
+        }
+
+        public WorkflowRunJobsListDto GetJobsForWorkflowRun(long workflowRunId)
+        {
+            var resultString = @"
+                {
+    ""total_count"": 4,
+    ""jobs"": [
+        {
+            ""id"": 1234,
+            ""run_id"": 123456789,
+            ""workflow_name"": ""* Staging Build"",
+            ""head_branch"": ""staging"",
+            ""run_url"": ""https://api.github.com/repos/OwnerName/repo-name/actions/runs/123456789"",
+            ""run_attempt"": 1,
+            ""url"": ""https://api.github.com/repos/OwnerName/repo-name/actions/jobs/1234"",
+            ""html_url"": ""https://github.com/OwnerName/repo-name/actions/runs/123456789/job/1234"",
+            ""status"": ""completed"",
+            ""conclusion"": ""success"",
+            ""created_at"": ""2024-07-24T22:31:48Z"",
+            ""started_at"": ""2024-07-24T22:32:53Z"",
+            ""completed_at"": ""2024-07-24T22:46:29Z"",
+            ""name"": ""Build / Build NetFX""
+        },
+        {
+            ""id"": 12345,
+            ""run_id"": 123456789,
+            ""workflow_name"": ""* Staging Build"",
+            ""head_branch"": ""staging"",
+            ""run_url"": ""https://api.github.com/repos/OwnerName/repo-name/actions/runs/12345"",
+            ""run_attempt"": 1,
+            ""url"": ""https://api.github.com/repos/OwnerName/repo-name/actions/jobs/27884800125"",
+            ""html_url"": ""https://github.com/OwnerName/repo-name/actions/runs/123456789/job/12345"",
+            ""status"": ""completed"",
+            ""conclusion"": ""success"",
+            ""created_at"": ""2024-07-24T22:31:48Z"",
+            ""started_at"": ""2024-07-24T22:32:05Z"",
+            ""completed_at"": ""2024-07-24T22:41:44Z"",
+            ""name"": ""Build / Build/Test Netcore""
+        },
+        {
+            ""id"": 123456,
+            ""run_id"": 123456789,
+            ""workflow_name"": ""* Staging Build"",
+            ""head_branch"": ""staging"",
+            ""run_url"": ""https://api.github.com/repos/OwnerName/repo-name/actions/runs/123456789"",
+            ""run_attempt"": 1,
+            ""url"": ""https://api.github.com/repos/OwnerName/repo-name/actions/jobs/27885205291"",
+            ""html_url"": ""https://github.com/OwnerName/repo-name/actions/runs/123456789/job/27885205291"",
+            ""status"": ""completed"",
+            ""conclusion"": ""success"",
+            ""created_at"": ""2024-07-24T22:46:30Z"",
+            ""started_at"": ""2024-07-24T22:46:39Z"",
+            ""completed_at"": ""2024-07-24T23:01:00Z"",
+            ""name"": ""Build / Test NetFX""
+        },
+        {
+            ""id"": 1234567,
+            ""run_id"": 123456789,
+            ""workflow_name"": ""* Staging Build"",
+            ""head_branch"": ""staging"",
+            ""run_url"": ""https://api.github.com/repos/OwnerName/repo-name/actions/runs/123456789"",
+            ""run_attempt"": 1,
+            ""url"": ""https://api.github.com/repos/OwnerName/repo-name/actions/jobs/1234567"",
+            ""html_url"": ""https://github.com/OwnerName/repo-name/actions/runs/123456789/job/1234567"",
+            ""status"": ""completed"",
+            ""conclusion"": ""success"",
+            ""created_at"": ""2024-07-24T22:46:31Z"",
+            ""started_at"": ""2024-07-24T22:46:36Z"",
+            ""completed_at"": ""2024-07-24T22:53:34Z"",
+            ""name"": ""Build / Build front-end""
+        }
+    ]
+}
+            ";
+
+            return JsonSerializer.Deserialize<WorkflowRunJobsListDto>(resultString);
         }
     }
 }

@@ -16,10 +16,13 @@ namespace GitHubActionsDataCollector
     internal class WorkflowRunProcessor : IWorkflowRunProcessor
     {
         private readonly IWorkflowRunRepository _workflowRunRepository;
+        private readonly IGitHubActionsApiClient _gitHubActionsApiClient;
 
-        public WorkflowRunProcessor(IWorkflowRunRepository workflowRunRepository)
+        public WorkflowRunProcessor(IWorkflowRunRepository workflowRunRepository,
+                                    IGitHubActionsApiClient gitHubActionsApiClient)
         {
             _workflowRunRepository = workflowRunRepository;
+            _gitHubActionsApiClient = gitHubActionsApiClient;
         }
 
         public void Process(WorkflowRunDto workflowRun)
@@ -47,6 +50,8 @@ namespace GitHubActionsDataCollector
                 Url = workflowRun.html_url,
                 NumAttempts = workflowRun.run_attempt
             });
+
+            GetWorkflowRunJobs(workflowRun.id);
         }
 
         private bool ShouldProcessWorkflowRun(WorkflowRunDto workflowRun)
@@ -55,6 +60,21 @@ namespace GitHubActionsDataCollector
                 return true;
 
             return false;
+        }
+
+        private void GetWorkflowRunJobs(long id)
+        {
+            // we might need to move this function into a service since it's doing quite a lot.
+            // it needs to page through the entire list of jobs for the workflow run. This might require multiple api calls.
+            // then it needs to deduplicate jobs between different run attempts. For some reason, the same job can appear in
+            // multiple run attempts even though it passed in an earlier run attempt.
+
+            // first get the list of jobs for this workflow run
+            var workflowRunJobs = _gitHubActionsApiClient.GetJobsForWorkflowRun(id);
+
+            // If the number of jobs returned is less than the total then we need to page for further results
+
+            // now we deduplicate the jobs and return
         }
     }
 }

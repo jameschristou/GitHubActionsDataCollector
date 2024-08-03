@@ -11,7 +11,7 @@ var services = scope.ServiceProvider;
 
 try
 {
-    services.GetRequiredService<Processor>().Run();
+    await services.GetRequiredService<Processor>().Run();
 }
 catch (Exception e)
 {
@@ -25,6 +25,7 @@ IHostBuilder CreateHostBuilder(string[] strings)
     return Host.CreateDefaultBuilder()
         .ConfigureServices((_, services) =>
         {
+            services.AddHttpClient();
             services.AddTransient<IGitHubActionsApiClient, GitHubActionsApiClient>();
             services.AddTransient<IWorkflowRunProcessor, WorkflowRunProcessor>();
             services.AddTransient<IWorkflowRunRepository, WorkflowRunRepository>();

@@ -18,7 +18,7 @@ namespace GitHubActionsDataCollector
             _gitHibActionsApiClient = gitHibActionsApiClient;
         }
 
-        public void Run()
+        public async Task Run()
         {
             // first get the list of workflow runs from the API client
             var workflowRuns = _gitHibActionsApiClient.GetWorkflowRuns(DateTime.Now.AddDays(-2));
@@ -26,7 +26,7 @@ namespace GitHubActionsDataCollector
             // then process each workflow run
             foreach(var workflowRun in workflowRuns.workflow_runs)
             {
-                _workflowRunProcessor.Process(workflowRun);
+                await _workflowRunProcessor.Process(workflowRun);
             }
         }
     }

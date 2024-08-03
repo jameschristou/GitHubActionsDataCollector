@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
+using System.Runtime;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -11,11 +13,19 @@ namespace GitHubActionsDataCollector.GitHubActionsApiClient
     {
         WorkflowRunListDto GetWorkflowRuns(DateTime fromDate);
         WorkflowRunDto GetWorkflowRun(int workflowRunId);
-        WorkflowRunJobsListDto GetJobsForWorkflowRun(long workflowRunId, int pageNumber);
+        Task<WorkflowRunJobsListDto> GetJobsForWorkflowRun(string repoOwner, string repoName, long workflowRunId, int pageNumber);
     }
 
     internal class GitHubActionsApiClient : IGitHubActionsApiClient
     {
+        private static string baseUrl = "https://api.github.com";
+        private readonly HttpClient _httpClient;
+
+        public GitHubActionsApiClient(HttpClient httpClient)
+        {
+            _httpClient = httpClient;
+        }
+
         public WorkflowRunDto GetWorkflowRun(int workflowRunId)
         {
             throw new NotImplementedException();
@@ -224,8 +234,24 @@ namespace GitHubActionsDataCollector.GitHubActionsApiClient
             return JsonSerializer.Deserialize<WorkflowRunListDto>(resultString);
         }
 
-        public WorkflowRunJobsListDto GetJobsForWorkflowRun(long workflowRunId, int pageNumber)
+        public async Task<WorkflowRunJobsListDto> GetJobsForWorkflowRun(string repoOwner, string repoName, long workflowRunId, int pageNumber)
         {
+            var url = $"{baseUrl}/repos/{repoOwner}/{repoName}/actions/runs/{workflowRunId}/jobs?per_page=100&pageNumber={pageNumber}&filter=all";
+
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, url);
+            var token = "<token>";
+
+            requestMessage.Headers.UserAgent.Add(new ProductInfoHeaderValue("AppName", "1.0"));
+            requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
+            requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Token", token);
+
+            //var response = await _httpClient.SendAsync(requestMessage);
+
+            //if (response == null || !response.IsSuccessStatusCode)
+            //{
+            //    //return default(T);
+            //}
+
             return pageNumber == 1 ? GetJobsForWorkflowRunPage1() : GetJobsForWorkflowRunPage2();
         }
 

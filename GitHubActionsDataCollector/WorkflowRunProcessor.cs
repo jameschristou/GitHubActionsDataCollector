@@ -6,7 +6,7 @@ namespace GitHubActionsDataCollector
 {
     public interface IWorkflowRunProcessor
     {
-        public void Process(WorkflowRunDto workflowRun);
+        public Task Process(WorkflowRunDto workflowRun);
     }
 
     /**
@@ -25,7 +25,7 @@ namespace GitHubActionsDataCollector
             _gitHubActionsApiClient = gitHubActionsApiClient;
         }
 
-        public void Process(WorkflowRunDto workflowRun)
+        public async Task Process(WorkflowRunDto workflowRun)
         {
             var createdAt = DateTime.Parse(workflowRun.created_at);
             var updatedAt = DateTime.Parse(workflowRun.updated_at);
@@ -51,7 +51,7 @@ namespace GitHubActionsDataCollector
                 NumAttempts = workflowRun.run_attempt
             });
 
-            GetWorkflowRunJobs(workflowRun.id);
+            await GetWorkflowRunJobs(workflowRun.id);
         }
 
         private bool ShouldProcessWorkflowRun(WorkflowRunDto workflowRun)
@@ -62,7 +62,7 @@ namespace GitHubActionsDataCollector
             return false;
         }
 
-        private void GetWorkflowRunJobs(long id)
+        private async Task GetWorkflowRunJobs(long workflowRunId)
         {
             var workflowJobs = new List<WorkflowRunJobModel>();
             var resultsPerPage = 4;
@@ -82,7 +82,7 @@ namespace GitHubActionsDataCollector
             {
                 pageNumber++;
 
-                var workflowRunJobs = _gitHubActionsApiClient.GetJobsForWorkflowRun(id, pageNumber);
+                var workflowRunJobs = await _gitHubActionsApiClient.GetJobsForWorkflowRun("", "", workflowRunId, pageNumber);
                 totalResults = workflowRunJobs.total_count;
 
                 foreach ( var job in workflowRunJobs.jobs)

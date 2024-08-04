@@ -11,9 +11,8 @@ namespace GitHubActionsDataCollector.GitHubActionsApiClient
 {
     public interface IGitHubActionsApiClient
     {
-        WorkflowRunListDto GetWorkflowRuns(DateTime fromDate);
-        WorkflowRunDto GetWorkflowRun(int workflowRunId);
-        Task<WorkflowRunJobsListDto> GetJobsForWorkflowRun(string repoOwner, string repoName, long workflowRunId, int pageNumber);
+        WorkflowRunListDto GetWorkflowRuns(string repoOwner, string repoName, long workflowId, DateTime fromDate, int pageNumber, int resultsPerPage);
+        Task<WorkflowRunJobsListDto> GetJobsForWorkflowRun(string repoOwner, string repoName, long workflowRunId, int pageNumber, int resultsPerPage);
     }
 
     internal class GitHubActionsApiClient : IGitHubActionsApiClient
@@ -26,12 +25,10 @@ namespace GitHubActionsDataCollector.GitHubActionsApiClient
             _httpClient = httpClient;
         }
 
-        public WorkflowRunDto GetWorkflowRun(int workflowRunId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public WorkflowRunListDto GetWorkflowRuns(DateTime fromDate)
+        /// <summary>
+        /// Gets paged workflow runs for a given workflow
+        /// </summary>
+        public WorkflowRunListDto GetWorkflowRuns(string repoOwner, string repoName, long workflowId, DateTime fromDate, int pageNumber, int resultsPerPage)
         {
             var resultString = @"
                 {
@@ -234,22 +231,32 @@ namespace GitHubActionsDataCollector.GitHubActionsApiClient
             return JsonSerializer.Deserialize<WorkflowRunListDto>(resultString);
         }
 
-        public async Task<WorkflowRunJobsListDto> GetJobsForWorkflowRun(string repoOwner, string repoName, long workflowRunId, int pageNumber)
+        /// <summary>
+        /// Gets paged workflow run jobs for a given workflow run
+        /// </summary>
+        public async Task<WorkflowRunJobsListDto> GetJobsForWorkflowRun(string repoOwner, string repoName, long workflowRunId, int pageNumber, int resultsPerPage)
         {
-            var url = $"{baseUrl}/repos/{repoOwner}/{repoName}/actions/runs/{workflowRunId}/jobs?per_page=100&pageNumber={pageNumber}&filter=all";
+            //workflowRunId = 0;
+            //repoOwner = "";
+            //repoName = "";
+
+            var url = $"{baseUrl}/repos/{repoOwner}/{repoName}/actions/runs/{workflowRunId}/jobs?per_page={resultsPerPage}&page={pageNumber}&filter=all";
 
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, url);
-            var token = "<token>";
 
-            requestMessage.Headers.UserAgent.Add(new ProductInfoHeaderValue("AppName", "1.0"));
+            // create a personal access token with github. See instructions here
+            // https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic
+            var token = "";
+
             requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
-            requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Token", token);
+            requestMessage.Headers.Add("X-GitHub-Api-Version", "2022-11-28");
+            requestMessage.Headers.Add("Authorization", $"Bearer {token}");
 
             //var response = await _httpClient.SendAsync(requestMessage);
 
             //if (response == null || !response.IsSuccessStatusCode)
             //{
-            //    //return default(T);
+            //    throw new Exception("Unable to retrieve workflow run jobs");
             //}
 
             return pageNumber == 1 ? GetJobsForWorkflowRunPage1() : GetJobsForWorkflowRunPage2();

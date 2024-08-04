@@ -11,7 +11,11 @@ var services = scope.ServiceProvider;
 
 try
 {
-    await services.GetRequiredService<Processor>().Run();
+    // for now hardcode the owner and repo names
+    var repoOwner = "";
+    var repoName = "";
+
+    await services.GetRequiredService<Processor>().Run(repoOwner, repoName);
 }
 catch (Exception e)
 {
@@ -28,6 +32,7 @@ IHostBuilder CreateHostBuilder(string[] strings)
             services.AddHttpClient();
             services.AddTransient<IGitHubActionsApiClient, GitHubActionsApiClient>();
             services.AddTransient<IWorkflowRunProcessor, WorkflowRunProcessor>();
+            services.AddTransient<IWorkflowRunJobsProcessor, WorkflowRunJobsProcessor>();
             services.AddTransient<IWorkflowRunRepository, WorkflowRunRepository>();
             services.AddSingleton<Processor>();
         });

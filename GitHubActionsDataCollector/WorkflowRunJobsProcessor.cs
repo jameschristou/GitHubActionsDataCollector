@@ -1,5 +1,6 @@
 ﻿using GitHubActionsDataCollector.GitHubActionsApiClient;
 using GitHubActionsDataCollector.Models;
+using GitHubActionsDataCollector.Repositories;
 
 namespace GitHubActionsDataCollector
 {
@@ -11,10 +12,13 @@ namespace GitHubActionsDataCollector
     internal class WorkflowRunJobsProcessor : IWorkflowRunJobsProcessor
     {
         private readonly IGitHubActionsApiClient _gitHubActionsApiClient;
+        private readonly IWorkflowRunJobsRepository _workflowRunJobsRepository;
 
-        public WorkflowRunJobsProcessor(IGitHubActionsApiClient gitHubActionsApiClient)
+        public WorkflowRunJobsProcessor(IGitHubActionsApiClient gitHubActionsApiClient,
+                                        IWorkflowRunJobsRepository workflowRunJobsRepository)
         {
             _gitHubActionsApiClient = gitHubActionsApiClient;
+            _workflowRunJobsRepository = workflowRunJobsRepository;
         }
 
         public async Task Process(string repoOwner, string repoName, long workflowRunId)
@@ -49,7 +53,7 @@ namespace GitHubActionsDataCollector
                     workflowJobs.Add(
                         new WorkflowRunJobModel
                         {
-                            Id = job.id
+                            RunId = job.id
                         }
                     );
 
@@ -62,6 +66,11 @@ namespace GitHubActionsDataCollector
 
             // now we can save the jobs to the DB
 
+            // we can then pull down the logs for each workflow run attempt. These will be received as a zip file.
+            // we'll need to processs this file and look for the test results in each log
+            // we'll need to be able to configure which jobs and which steps in each job contain test logs and what type of logs these are
+            // or we can allow the user to write a custom class to deal with these
+            _workflowRunJobsRepository.SaveJobs(workflowJobs);
         }
 
         private string GenerateJobKey(WorkflowRunJobDto job)

@@ -359,7 +359,33 @@ namespace GitHubActionsDataCollector.GitHubActionsApiClient
             ""created_at"": ""2024-07-24T22:31:48Z"",
             ""started_at"": ""2024-07-24T22:32:53Z"",
             ""completed_at"": ""2024-07-24T22:46:29Z"",
-            ""name"": ""Run more tests""
+            ""name"": ""Run more tests"",
+            ""steps"": [
+                {
+                    ""name"": ""Set up job"",
+                    ""status"": ""completed"",
+                    ""conclusion"": ""success"",
+                    ""number"": 1,
+                    ""started_at"": ""2024-07-24T23:33:51Z"",
+                    ""completed_at"": ""2024-07-24T23:33:52Z""
+                },
+                {
+                    ""name"": ""Run tests"",
+                    ""status"": ""completed"",
+                    ""conclusion"": ""success"",
+                    ""number"": 2,
+                    ""started_at"": ""2024-07-24T23:34:29Z"",
+                    ""completed_at"": ""2024-07-25T00:24:35Z""
+                },
+                {
+                    ""name"": ""Complete job"",
+                    ""status"": ""completed"",
+                    ""conclusion"": ""success"",
+                    ""number"": 3,
+                    ""started_at"": ""2024-07-25T00:24:36Z"",
+                    ""completed_at"": ""2024-07-25T00:24:37Z""
+                }
+            ]
         },
         {
             ""id"": 123456789,

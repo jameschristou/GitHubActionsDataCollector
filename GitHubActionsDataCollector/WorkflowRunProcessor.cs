@@ -1,6 +1,6 @@
 ﻿using GitHubActionsDataCollector.GitHubActionsApiClient;
 using GitHubActionsDataCollector.Models;
-using GitHubActionsDataCollector.Repository;
+using GitHubActionsDataCollector.Repositories;
 
 namespace GitHubActionsDataCollector
 {
@@ -45,9 +45,11 @@ namespace GitHubActionsDataCollector
 
             _workflowRunRepository.SaveWorkflowRun(new WorkflowRunModel
             {
-                Id = workflowRun.id,
-                DateCompletedUtc = updatedAt,
-                DateStartedUtc = createdAt,
+                RunId = workflowRun.id,
+                WorkflowId = workflowRun.workflow_id,
+                WorkflowName = workflowRun.name,
+                CompletedAtUtc = updatedAt,
+                StartedAtUtc = createdAt,
                 Title = workflowRun.title,
                 Conclusion = workflowRun.conclusion,
                 Url = workflowRun.html_url,

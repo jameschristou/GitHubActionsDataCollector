@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GitHubActionsDataCollector.Repository
+namespace GitHubActionsDataCollector.Repositories
 {
     public interface IWorkflowRunRepository
     {
@@ -16,7 +16,7 @@ namespace GitHubActionsDataCollector.Repository
     {
         public void SaveWorkflowRun(WorkflowRunModel workflowRun)
         {
-            Console.WriteLine($"Saving workflowRun:{workflowRun.Id}");
+            Console.WriteLine($"Saving workflowRun:{workflowRun.RunId}");
         }
     }
 }

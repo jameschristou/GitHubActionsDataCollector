@@ -1,8 +1,12 @@
-﻿using GitHubActionsDataCollector;
+﻿using FluentNHibernate.Cfg.Db;
+using FluentNHibernate.Cfg;
+using GitHubActionsDataCollector;
 using GitHubActionsDataCollector.GitHubActionsApiClient;
 using GitHubActionsDataCollector.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NHibernate.Driver;
+using NHibernate;
 
 using IHost host = CreateHostBuilder(args).Build();
 using var scope = host.Services.CreateScope();
@@ -36,5 +40,20 @@ IHostBuilder CreateHostBuilder(string[] strings)
             services.AddTransient<IWorkflowRunRepository, WorkflowRunRepository>();
             services.AddTransient<IWorkflowRunJobsRepository, WorkflowRunJobsRepository>();
             services.AddSingleton<Processor>();
+
+            // NHibernate session factory registration
+            services.AddSingleton<ISessionFactory>(CreateNHibernateSessionFactory());
         });
+}
+
+ISessionFactory CreateNHibernateSessionFactory()
+{
+    return Fluently.Configure()
+      .Database(
+        MsSqlConfiguration.MsSql2012
+            .Driver<MicrosoftDataSqlClientDriver>()
+            .ConnectionString("Server=.\\SQLEXPRESS;Database=GHAData;Integrated Security=True;Encrypt=false"))
+      .Mappings(m =>
+        m.FluentMappings.AddFromAssemblyOf<Program>())
+      .BuildSessionFactory();
 }

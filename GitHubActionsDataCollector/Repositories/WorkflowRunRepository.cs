@@ -1,8 +1,5 @@
-﻿using FluentNHibernate.Cfg.Db;
-using FluentNHibernate.Cfg;
-using GitHubActionsDataCollector.Entities;
+﻿using GitHubActionsDataCollector.Entities;
 using NHibernate;
-using NHibernate.Driver;
 
 namespace GitHubActionsDataCollector.Repositories
 {
@@ -13,11 +10,16 @@ namespace GitHubActionsDataCollector.Repositories
 
     public class WorkflowRunRepository : IWorkflowRunRepository
     {
+        private readonly ISessionFactory _sessionFactory;
+
+        public WorkflowRunRepository(ISessionFactory sessionFactory)
+        {
+            _sessionFactory = sessionFactory;
+        }
+
         public void SaveWorkflowRun(WorkflowRun workflowRun)
         {
-            var sessionFactory = CreateSessionFactory();
-
-            using (var session = sessionFactory.OpenSession())
+            using (var session = _sessionFactory.OpenSession())
             {
                 using (var transaction = session.BeginTransaction())
                 {
@@ -27,18 +29,6 @@ namespace GitHubActionsDataCollector.Repositories
             }
 
             Console.WriteLine($"Saving workflowRun:{workflowRun.RunId}");
-        }
-
-        private static ISessionFactory CreateSessionFactory()
-        {
-            return Fluently.Configure()
-              .Database(
-                MsSqlConfiguration.MsSql2012
-                    .Driver<MicrosoftDataSqlClientDriver>()
-                    .ConnectionString("Server=.\\SQLEXPRESS;Database=GHAData;Integrated Security=True;Encrypt=false"))
-              .Mappings(m =>
-                m.FluentMappings.AddFromAssemblyOf<Program>())
-              .BuildSessionFactory();
         }
     }
 }

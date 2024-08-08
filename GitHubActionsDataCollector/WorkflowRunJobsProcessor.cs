@@ -53,8 +53,15 @@ namespace GitHubActionsDataCollector
                     workflowJobs.Add(
                         new WorkflowRunJob
                         {
-                            RunId = job.id
-                        }
+                            RunId = job.run_id,
+                            JobId = job.id,
+                            RunAttempt = job.run_attempt,
+                            Name = job.name,
+                            Conclusion = job.conclusion,
+                            Url = job.html_url,
+                            StartedAtUtc = DateTime.Parse(job.started_at),
+                            CompletedAtUtc = DateTime.Parse(job.completed_at)
+                }
                     );
 
                     jobIndex.Add(jobKey, job.id);

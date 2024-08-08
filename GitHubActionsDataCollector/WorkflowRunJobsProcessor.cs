@@ -1,5 +1,5 @@
 ﻿using GitHubActionsDataCollector.GitHubActionsApiClient;
-using GitHubActionsDataCollector.Models;
+using GitHubActionsDataCollector.Entities;
 using GitHubActionsDataCollector.Repositories;
 
 namespace GitHubActionsDataCollector
@@ -23,7 +23,7 @@ namespace GitHubActionsDataCollector
 
         public async Task Process(string repoOwner, string repoName, long workflowRunId)
         {
-            var workflowJobs = new List<WorkflowRunJobModel>();
+            var workflowJobs = new List<WorkflowRunJob>();
             var resultsPerPage = 4;
 
             // it needs to page through the entire list of jobs for the workflow run. This might require multiple api calls.
@@ -51,7 +51,7 @@ namespace GitHubActionsDataCollector
                     if (jobIndex.ContainsKey(jobKey)) continue;
 
                     workflowJobs.Add(
-                        new WorkflowRunJobModel
+                        new WorkflowRunJob
                         {
                             RunId = job.id
                         }

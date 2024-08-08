@@ -1,22 +1,44 @@
-﻿using GitHubActionsDataCollector.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FluentNHibernate.Cfg.Db;
+using FluentNHibernate.Cfg;
+using GitHubActionsDataCollector.Entities;
+using NHibernate;
+using NHibernate.Driver;
 
 namespace GitHubActionsDataCollector.Repositories
 {
     public interface IWorkflowRunRepository
     {
-        public void SaveWorkflowRun(WorkflowRunModel workflowRun);
+        public void SaveWorkflowRun(WorkflowRun workflowRun);
     }
 
-    internal class WorkflowRunRepository : IWorkflowRunRepository
+    public class WorkflowRunRepository : IWorkflowRunRepository
     {
-        public void SaveWorkflowRun(WorkflowRunModel workflowRun)
+        public void SaveWorkflowRun(WorkflowRun workflowRun)
         {
+            var sessionFactory = CreateSessionFactory();
+
+            using (var session = sessionFactory.OpenSession())
+            {
+                using (var transaction = session.BeginTransaction())
+                {
+                    session.Save(workflowRun);
+                    transaction.Commit();
+                }
+            }
+
             Console.WriteLine($"Saving workflowRun:{workflowRun.RunId}");
+        }
+
+        private static ISessionFactory CreateSessionFactory()
+        {
+            return Fluently.Configure()
+              .Database(
+                MsSqlConfiguration.MsSql2012
+                    .Driver<MicrosoftDataSqlClientDriver>()
+                    .ConnectionString("Server=.\\SQLEXPRESS;Database=GHAData;Integrated Security=True;Encrypt=false"))
+              .Mappings(m =>
+                m.FluentMappings.AddFromAssemblyOf<Program>())
+              .BuildSessionFactory();
         }
     }
 }

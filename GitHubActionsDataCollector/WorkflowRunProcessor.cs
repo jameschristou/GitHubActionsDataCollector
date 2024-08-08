@@ -1,5 +1,5 @@
 ﻿using GitHubActionsDataCollector.GitHubActionsApiClient;
-using GitHubActionsDataCollector.Models;
+using GitHubActionsDataCollector.Entities;
 using GitHubActionsDataCollector.Repositories;
 
 namespace GitHubActionsDataCollector
@@ -43,7 +43,7 @@ namespace GitHubActionsDataCollector
                 return;
             }
 
-            _workflowRunRepository.SaveWorkflowRun(new WorkflowRunModel
+            _workflowRunRepository.SaveWorkflowRun(new WorkflowRun
             {
                 RunId = workflowRun.id,
                 WorkflowId = workflowRun.workflow_id,

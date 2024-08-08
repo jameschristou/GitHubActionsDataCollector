@@ -1,5 +1,5 @@
 CREATE TABLE WorkflowRun (
-    Id int,
+    Id int IDENTITY(1,1) PRIMARY KEY,
 	RunId bigint,
     WorkflowId bigint,
     WorkflowName varchar(255),

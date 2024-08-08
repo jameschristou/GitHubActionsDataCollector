@@ -1,5 +1,5 @@
 CREATE TABLE WorkflowRunJob (
-    Id int,
+    Id int IDENTITY(1,1) PRIMARY KEY,
 	RunId bigint,
     JobId bigint,
     RunAttempt smallint,

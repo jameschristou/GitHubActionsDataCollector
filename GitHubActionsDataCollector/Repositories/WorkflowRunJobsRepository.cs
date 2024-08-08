@@ -1,4 +1,4 @@
-﻿using GitHubActionsDataCollector.Models;
+﻿using GitHubActionsDataCollector.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,11 +9,11 @@ namespace GitHubActionsDataCollector.Repositories
 {
     public interface IWorkflowRunJobsRepository
     {
-        public void SaveJobs(List<WorkflowRunJobModel> jobs);
+        public void SaveJobs(List<WorkflowRunJob> jobs);
     }
     public class WorkflowRunJobsRepository : IWorkflowRunJobsRepository
     {
-        public void SaveJobs(List<WorkflowRunJobModel> jobs)
+        public void SaveJobs(List<WorkflowRunJob> jobs)
         {
             
         }

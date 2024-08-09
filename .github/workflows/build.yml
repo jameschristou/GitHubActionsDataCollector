@@ -5,7 +5,7 @@ on: [push]
 jobs:
 
   build_netcore:
-    name: Build Netcore
+    name: Build/Test GitHubActionsDataCollector
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

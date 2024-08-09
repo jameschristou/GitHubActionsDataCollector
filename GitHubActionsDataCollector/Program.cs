@@ -16,10 +16,11 @@ var services = scope.ServiceProvider;
 try
 {
     // for now hardcode the owner and repo names
-    var repoOwner = "";
-    var repoName = "";
+    var repoOwner = "jameschristou";
+    var repoName = "GitHubActionsDataCollector";
+    var workflowId = 111639860; // you can get this id using https://api.github.com/repos/jameschristou/GitHubActionsDataCollector/actions/workflows
 
-    await services.GetRequiredService<Processor>().Run(repoOwner, repoName);
+    await services.GetRequiredService<Processor>().Run(repoOwner, repoName, workflowId);
 }
 catch (Exception e)
 {

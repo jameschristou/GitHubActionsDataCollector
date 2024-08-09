@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http.Headers;
-using System.Runtime;
-using System.Text;
+﻿using System.Net.Http.Headers;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace GitHubActionsDataCollector.GitHubActionsApiClient
 {
     public interface IGitHubActionsApiClient
     {
-        WorkflowRunListDto GetWorkflowRuns(string repoOwner, string repoName, long workflowId, DateTime fromDate, int pageNumber, int resultsPerPage);
+        Task<WorkflowRunListDto> GetWorkflowRuns(string repoOwner, string repoName, long workflowId, DateTime fromDate, int pageNumber, int resultsPerPage);
         Task<WorkflowRunJobsListDto> GetJobsForWorkflowRun(string repoOwner, string repoName, long workflowRunId, int pageNumber, int resultsPerPage);
     }
 
@@ -28,7 +22,37 @@ namespace GitHubActionsDataCollector.GitHubActionsApiClient
         /// <summary>
         /// Gets paged workflow runs for a given workflow
         /// </summary>
-        public WorkflowRunListDto GetWorkflowRuns(string repoOwner, string repoName, long workflowId, DateTime fromDate, int pageNumber, int resultsPerPage)
+        public async Task<WorkflowRunListDto> GetWorkflowRuns(string owner, string repo, long workflowId, DateTime fromDate, int pageNumber, int resultsPerPage)
+        {
+            // [Get workflow runs for a workflow](https://docs.github.com/en/rest/actions/workflow-runs?apiVersion=2022-11-28#list-workflow-runs-for-a-workflow)
+            var url = $"{baseUrl}/repos/{owner}/{repo}/actions/workflows/{workflowId}/runs?per_page={resultsPerPage}&page={pageNumber}";
+
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, url);
+
+            // create a personal access token with github. See instructions here
+            // https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic
+            var token = "";
+
+            requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
+            requestMessage.Headers.Add("X-GitHub-Api-Version", "2022-11-28");
+            requestMessage.Headers.Add("User-agent", "request");
+
+            if (!string.IsNullOrEmpty(token))
+            {
+                requestMessage.Headers.Add("Authorization", $"Bearer {token}");
+            }
+
+            var response = await _httpClient.SendAsync(requestMessage);
+
+            if (response == null || !response.IsSuccessStatusCode)
+            {
+                throw new Exception($"Unable to retrieve workflow runs for workflow:{workflowId}");
+            }
+
+            return JsonSerializer.Deserialize<WorkflowRunListDto>(await response.Content.ReadAsStringAsync());
+        }
+
+        private WorkflowRunListDto GetWorkflowRunsMocked(string repoOwner, string repoName, long workflowId, DateTime fromDate, int pageNumber, int resultsPerPage)
         {
             // [Get workflow runs for a workflow](https://docs.github.com/en/rest/actions/workflow-runs?apiVersion=2022-11-28#list-workflow-runs-for-a-workflow)
             var resultString = @"
@@ -235,14 +259,10 @@ namespace GitHubActionsDataCollector.GitHubActionsApiClient
         /// <summary>
         /// Gets paged workflow run jobs for a given workflow run
         /// </summary>
-        public async Task<WorkflowRunJobsListDto> GetJobsForWorkflowRun(string repoOwner, string repoName, long workflowRunId, int pageNumber, int resultsPerPage)
+        public async Task<WorkflowRunJobsListDto> GetJobsForWorkflowRun(string owner, string repo, long workflowRunId, int pageNumber, int resultsPerPage)
         {
-            //workflowRunId = 0;
-            //repoOwner = "";
-            //repoName = "";
-
             // [List jobs for a workflow run](https://docs.github.com/en/rest/actions/workflow-jobs?apiVersion=2022-11-28#list-jobs-for-a-workflow-run)
-            var url = $"{baseUrl}/repos/{repoOwner}/{repoName}/actions/runs/{workflowRunId}/jobs?per_page={resultsPerPage}&page={pageNumber}&filter=all";
+            var url = $"{baseUrl}/repos/{owner}/{repo}/actions/runs/{workflowRunId}/jobs?per_page={resultsPerPage}&page={pageNumber}&filter=all";
 
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, url);
 
@@ -252,16 +272,23 @@ namespace GitHubActionsDataCollector.GitHubActionsApiClient
 
             requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
             requestMessage.Headers.Add("X-GitHub-Api-Version", "2022-11-28");
-            requestMessage.Headers.Add("Authorization", $"Bearer {token}");
+            requestMessage.Headers.Add("User-agent", "request");
 
-            //var response = await _httpClient.SendAsync(requestMessage);
+            if (!string.IsNullOrEmpty(token))
+            {
+                requestMessage.Headers.Add("Authorization", $"Bearer {token}");
+            }
 
-            //if (response == null || !response.IsSuccessStatusCode)
-            //{
-            //    throw new Exception("Unable to retrieve workflow run jobs");
-            //}
+            var response = await _httpClient.SendAsync(requestMessage);
 
-            return pageNumber == 1 ? GetJobsForWorkflowRunPage1() : GetJobsForWorkflowRunPage2();
+            if (response == null || !response.IsSuccessStatusCode)
+            {
+                throw new Exception($"Unable to retrieve workflow run jobs for workflowRun:{workflowRunId}");
+            }
+
+            return JsonSerializer.Deserialize<WorkflowRunJobsListDto>(await response.Content.ReadAsStringAsync());
+
+            //return pageNumber == 1 ? GetJobsForWorkflowRunPage1() : GetJobsForWorkflowRunPage2();
         }
 
         private WorkflowRunJobsListDto GetJobsForWorkflowRunPage1()

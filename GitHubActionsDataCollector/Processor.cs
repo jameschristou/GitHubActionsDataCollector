@@ -13,16 +13,15 @@ namespace GitHubActionsDataCollector
             _gitHibActionsApiClient = gitHibActionsApiClient;
         }
 
-        public async Task Run(string repoOwner, string repoName)
+        public async Task Run(string repoOwner, string repoName, long workflowId)
         {
             // hardcode the workflowId for now
-            var workflowId = 1234;
             var pageNumber = 1;
             var resultsPerPage = 10;
 
             // first get the list of workflow runs from the API client
             // we're going to have to improve this and deal with paging etc
-            var workflowRuns = _gitHibActionsApiClient.GetWorkflowRuns(repoOwner, repoName, workflowId, DateTime.Now.AddDays(-2), pageNumber, resultsPerPage);
+            var workflowRuns = await _gitHibActionsApiClient.GetWorkflowRuns(repoOwner, repoName, workflowId, DateTime.Now.AddDays(-2), pageNumber, resultsPerPage);
 
             // then process each workflow run
             foreach(var workflowRun in workflowRuns.workflow_runs)

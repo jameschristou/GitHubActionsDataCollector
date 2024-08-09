@@ -28,14 +28,14 @@ namespace GitHubActionsDataCollector
             _gitHubActionsApiClient = gitHubActionsApiClient;
         }
 
-        public async Task Process(string repoOwner, string repoName, WorkflowRunDto workflowRun)
+        public async Task Process(string owner, string repo, WorkflowRunDto workflowRun)
         {
             var createdAt = DateTime.Parse(workflowRun.created_at);
             var updatedAt = DateTime.Parse(workflowRun.updated_at);
 
             var duration = updatedAt.Subtract(createdAt);
 
-            Console.WriteLine($"WorkflowRunId:{workflowRun.id} Title:{workflowRun.title} Duration:{duration} RunAttempts:{workflowRun.run_attempt} Conclusion:{workflowRun.conclusion}");
+            Console.WriteLine($"WorkflowRunId:{workflowRun.id} Title:{workflowRun.display_title} Duration:{duration} RunAttempts:{workflowRun.run_attempt} Conclusion:{workflowRun.conclusion}");
 
             if (!ShouldProcessWorkflowRun(workflowRun))
             {
@@ -45,18 +45,20 @@ namespace GitHubActionsDataCollector
 
             _workflowRunRepository.SaveWorkflowRun(new WorkflowRun
             {
+                Owner = owner,
+                Repo = repo,
                 RunId = workflowRun.id,
                 WorkflowId = workflowRun.workflow_id,
                 WorkflowName = workflowRun.name,
                 CompletedAtUtc = updatedAt,
                 StartedAtUtc = createdAt,
-                Title = workflowRun.title,
+                Title = workflowRun.display_title,
                 Conclusion = workflowRun.conclusion,
                 Url = workflowRun.html_url,
                 NumAttempts = workflowRun.run_attempt
             });
 
-            await _workflowRunJobsProcessor.Process(repoOwner, repoName, workflowRun.id);
+            await _workflowRunJobsProcessor.Process(owner, repo, workflowRun.id);
         }
 
         private bool ShouldProcessWorkflowRun(WorkflowRunDto workflowRun)

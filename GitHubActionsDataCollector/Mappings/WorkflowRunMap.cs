@@ -8,6 +8,8 @@ namespace GitHubActionsDataCollector.Mappings
         public WorkflowRunMap() 
         {
             Id(x => x.Id);
+            Map(x => x.Owner);
+            Map(x => x.Repo);
             Map(x => x.RunId);
             Map(x => x.WorkflowId);
             Map(x => x.WorkflowName);

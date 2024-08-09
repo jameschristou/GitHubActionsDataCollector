@@ -3,6 +3,8 @@
     public class WorkflowRun
     {
         public virtual int Id { get; protected set; }
+        public virtual string Owner { get; set; }
+        public virtual string Repo { get; set; }
         public virtual long RunId { get; set; }
         public virtual long WorkflowId { get; set; }
         public virtual string WorkflowName { get; set; }

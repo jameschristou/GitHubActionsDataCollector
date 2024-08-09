@@ -1,0 +1,28 @@
+name: build
+
+on: [push]
+
+jobs:
+
+  build_netcore:
+    name: Build Netcore
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Output dotnet info
+        run: dotnet --info
+
+      - name: Restore GitHubActionsDataCollector.sln
+        # restoring the tests project will implicitly restore the core project
+        run: |
+          dotnet restore ./GitHubActionsDataCollector.sln --verbosity m
+
+      - name: Build GitHubActionsDataCollector.sln
+        run: |
+          dotnet build ./GitHubActionsDataCollector.sln --configuration Release --no-restore
+
+      - name: Test GitHubActionsDataCollector.sln
+        run: |
+          dotnet test ./GitHubActionsDataCollector.sln --configuration Release '-l:trx;LogFileName=TestResults.xml' --no-build --filter "Category!=Manual"

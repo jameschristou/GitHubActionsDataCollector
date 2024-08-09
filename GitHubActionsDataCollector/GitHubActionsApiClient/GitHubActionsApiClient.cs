@@ -30,6 +30,7 @@ namespace GitHubActionsDataCollector.GitHubActionsApiClient
         /// </summary>
         public WorkflowRunListDto GetWorkflowRuns(string repoOwner, string repoName, long workflowId, DateTime fromDate, int pageNumber, int resultsPerPage)
         {
+            // [Get workflow runs for a workflow](https://docs.github.com/en/rest/actions/workflow-runs?apiVersion=2022-11-28#list-workflow-runs-for-a-workflow)
             var resultString = @"
                 {
     ""total_count"": 1638,
@@ -240,6 +241,7 @@ namespace GitHubActionsDataCollector.GitHubActionsApiClient
             //repoOwner = "";
             //repoName = "";
 
+            // [List jobs for a workflow run](https://docs.github.com/en/rest/actions/workflow-jobs?apiVersion=2022-11-28#list-jobs-for-a-workflow-run)
             var url = $"{baseUrl}/repos/{repoOwner}/{repoName}/actions/runs/{workflowRunId}/jobs?per_page={resultsPerPage}&page={pageNumber}&filter=all";
 
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, url);

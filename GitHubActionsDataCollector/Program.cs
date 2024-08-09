@@ -20,7 +20,7 @@ try
     var repoName = "GitHubActionsDataCollector";
     var workflowId = 111639860; // you can get this id using https://api.github.com/repos/jameschristou/GitHubActionsDataCollector/actions/workflows
 
-    await services.GetRequiredService<Processor>().Run(repoOwner, repoName, workflowId);
+    await services.GetRequiredService<WorkflowProcessor>().Process(repoOwner, repoName, workflowId);
 }
 catch (Exception e)
 {
@@ -40,7 +40,7 @@ IHostBuilder CreateHostBuilder(string[] strings)
             services.AddTransient<IWorkflowRunJobsProcessor, WorkflowRunJobsProcessor>();
             services.AddTransient<IWorkflowRunRepository, WorkflowRunRepository>();
             services.AddTransient<IWorkflowRunJobsRepository, WorkflowRunJobsRepository>();
-            services.AddSingleton<Processor>();
+            services.AddSingleton<WorkflowProcessor>();
 
             // NHibernate session factory registration
             services.AddSingleton<ISessionFactory>(CreateNHibernateSessionFactory());

@@ -25,17 +25,16 @@ namespace GitHubActionsDataCollector
         {
             var workflowJobs = new List<WorkflowRunJob>();
             var resultsPerPage = 4;
-
-            // it needs to page through the entire list of jobs for the workflow run. This might require multiple api calls.
-            // then it needs to deduplicate jobs between different run attempts. For some reason, the same job can appear in
-            // multiple run attempts even though it passed in an earlier run attempt.
-            var totalResults = 0;
             var pageNumber = 0;
             // we use the jobIndex to keep track of which jobs we have already seen (some jobs seem to be captured multiple times, even though
             // they are only run once). We can use {name}-{started_at}-{completed_at} as the key to ensure they are unique. This ensures we capture
             // each unique occurence of a job
             var jobIndex = new Dictionary<string, long>();
+            int totalResults;
 
+            // it needs to page through the entire list of jobs for the workflow run. This might require multiple api calls.
+            // then it needs to deduplicate jobs between different run attempts. For some reason, the same job can appear in
+            // multiple run attempts even though it passed in an earlier run attempt.
             do
             {
                 pageNumber++;
@@ -61,7 +60,7 @@ namespace GitHubActionsDataCollector
                             Url = job.html_url,
                             StartedAtUtc = DateTime.Parse(job.started_at),
                             CompletedAtUtc = DateTime.Parse(job.completed_at)
-                }
+                        }
                     );
 
                     jobIndex.Add(jobKey, job.id);

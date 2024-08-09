@@ -1,4 +1,5 @@
 ﻿using System.Net.Http.Headers;
+using System.Security.Policy;
 using System.Text.Json;
 
 namespace GitHubActionsDataCollector.GitHubActionsApiClient
@@ -27,22 +28,7 @@ namespace GitHubActionsDataCollector.GitHubActionsApiClient
             // [Get workflow runs for a workflow](https://docs.github.com/en/rest/actions/workflow-runs?apiVersion=2022-11-28#list-workflow-runs-for-a-workflow)
             var url = $"{baseUrl}/repos/{owner}/{repo}/actions/workflows/{workflowId}/runs?per_page={resultsPerPage}&page={pageNumber}";
 
-            var requestMessage = new HttpRequestMessage(HttpMethod.Get, url);
-
-            // create a personal access token with github. See instructions here
-            // https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic
-            var token = "";
-
-            requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
-            requestMessage.Headers.Add("X-GitHub-Api-Version", "2022-11-28");
-            requestMessage.Headers.Add("User-agent", "request");
-
-            if (!string.IsNullOrEmpty(token))
-            {
-                requestMessage.Headers.Add("Authorization", $"Bearer {token}");
-            }
-
-            var response = await _httpClient.SendAsync(requestMessage);
+            var response = await _httpClient.SendAsync(BuildRequest(url));
 
             if (response == null || !response.IsSuccessStatusCode)
             {
@@ -256,14 +242,8 @@ namespace GitHubActionsDataCollector.GitHubActionsApiClient
             return JsonSerializer.Deserialize<WorkflowRunListDto>(resultString);
         }
 
-        /// <summary>
-        /// Gets paged workflow run jobs for a given workflow run
-        /// </summary>
-        public async Task<WorkflowRunJobsListDto> GetJobsForWorkflowRun(string owner, string repo, long workflowRunId, int pageNumber, int resultsPerPage)
+        private HttpRequestMessage BuildRequest(string url)
         {
-            // [List jobs for a workflow run](https://docs.github.com/en/rest/actions/workflow-jobs?apiVersion=2022-11-28#list-jobs-for-a-workflow-run)
-            var url = $"{baseUrl}/repos/{owner}/{repo}/actions/runs/{workflowRunId}/jobs?per_page={resultsPerPage}&page={pageNumber}&filter=all";
-
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, url);
 
             // create a personal access token with github. See instructions here
@@ -279,7 +259,18 @@ namespace GitHubActionsDataCollector.GitHubActionsApiClient
                 requestMessage.Headers.Add("Authorization", $"Bearer {token}");
             }
 
-            var response = await _httpClient.SendAsync(requestMessage);
+            return requestMessage;
+        }
+
+        /// <summary>
+        /// Gets paged workflow run jobs for a given workflow run
+        /// </summary>
+        public async Task<WorkflowRunJobsListDto> GetJobsForWorkflowRun(string owner, string repo, long workflowRunId, int pageNumber, int resultsPerPage)
+        {
+            // [List jobs for a workflow run](https://docs.github.com/en/rest/actions/workflow-jobs?apiVersion=2022-11-28#list-jobs-for-a-workflow-run)
+            var url = $"{baseUrl}/repos/{owner}/{repo}/actions/runs/{workflowRunId}/jobs?per_page={resultsPerPage}&page={pageNumber}&filter=all";
+
+            var response = await _httpClient.SendAsync(BuildRequest(url));
 
             if (response == null || !response.IsSuccessStatusCode)
             {

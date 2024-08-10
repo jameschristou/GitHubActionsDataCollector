@@ -15,12 +15,17 @@ var services = scope.ServiceProvider;
 
 try
 {
-    // for now hardcode the owner and repo names
-    var repoOwner = "jameschristou";
-    var repoName = "GitHubActionsDataCollector";
-    var workflowId = 111639860; // you can get this id using https://api.github.com/repos/jameschristou/GitHubActionsDataCollector/actions/workflows
+    // get the workflow to process
+    // TODO enable processing of multiple workflows in a single execution of this application
+    var workflow = await services.GetRequiredService<IRegisteredWorkflowRepository>().GetNextWorkflow();
 
-    await services.GetRequiredService<WorkflowProcessor>().Process(repoOwner, repoName, workflowId);
+    if (workflow == null)
+    {
+        Console.WriteLine("No workflows to process!");
+        return;
+    }
+
+    await services.GetRequiredService<WorkflowProcessor>().Process(workflow);
 }
 catch (Exception e)
 {
@@ -40,6 +45,7 @@ IHostBuilder CreateHostBuilder(string[] strings)
             services.AddTransient<IWorkflowRunJobsProcessor, WorkflowRunJobsProcessor>();
             services.AddTransient<IWorkflowRunRepository, WorkflowRunRepository>();
             services.AddTransient<IWorkflowRunJobsRepository, WorkflowRunJobsRepository>();
+            services.AddTransient<IRegisteredWorkflowRepository, RegisteredWorkflowRepository>();
             services.AddSingleton<WorkflowProcessor>();
 
             // NHibernate session factory registration

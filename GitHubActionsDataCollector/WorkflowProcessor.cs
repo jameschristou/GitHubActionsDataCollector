@@ -1,4 +1,5 @@
-﻿using GitHubActionsDataCollector.GitHubActionsApiClient;
+﻿using GitHubActionsDataCollector.Entities;
+using GitHubActionsDataCollector.GitHubActionsApiClient;
 
 namespace GitHubActionsDataCollector
 {
@@ -13,7 +14,7 @@ namespace GitHubActionsDataCollector
             _gitHibActionsApiClient = gitHibActionsApiClient;
         }
 
-        public async Task Process(string repoOwner, string repoName, long workflowId)
+        public async Task Process(RegisteredWorkflow registeredWorkflow)
         {
             // hardcode the workflowId for now
             var pageNumber = 0;
@@ -26,13 +27,13 @@ namespace GitHubActionsDataCollector
             {
                 pageNumber++;
 
-                var workflowRuns = await _gitHibActionsApiClient.GetWorkflowRuns(repoOwner, repoName, workflowId, DateTime.Now.AddDays(-2), pageNumber, resultsPerPage);
+                var workflowRuns = await _gitHibActionsApiClient.GetWorkflowRuns(registeredWorkflow.Owner, registeredWorkflow.Repo, registeredWorkflow.WorkflowId, DateTime.Now.AddDays(-2), pageNumber, resultsPerPage);
                 totalResults = workflowRuns.total_count;
 
                 // then process each workflow run returned
                 foreach (var workflowRun in workflowRuns.workflow_runs)
                 {
-                    await _workflowRunProcessor.Process(repoOwner, repoName, workflowRun);
+                    await _workflowRunProcessor.Process(registeredWorkflow.Owner, registeredWorkflow.Repo, workflowRun);
                 }
 
                 numProcessed++;

@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Repositories\Sql Scripts\" />
+    <Folder Include="Repositories\Sql Scripts\HelperScripts\" />
   </ItemGroup>
 
 </Project>

@@ -22,8 +22,8 @@ Drive the workflows to process from a SQL table and enable the process to restar
 
 TODO
 * Loop through the workflow runs and implement paging (DONE)
+* Have a registration of workflows that we process rather than having this hardcoded (DONE)
 * When starting the processing, pick up where we left off by checking the last workflow run processed
-* Have a registration of workflows that we process and keep track of last checked for each workflow
 * Link the WorkflowRun and WorkflowRunJob tables through the Id column on WorkflowRun.
 * Add unit tests and run the unit tests in the workflow for GitHubActionsDataCollector
 * Add audit date columns

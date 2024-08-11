@@ -11,5 +11,6 @@
         public virtual DateTime StartedAtUtc { get; set; }
         public virtual DateTime CompletedAtUtc { get; set; }
         public virtual string Url { get; set; }
+        public virtual WorkflowRun WorkflowRun { get; set; }
     }
 }

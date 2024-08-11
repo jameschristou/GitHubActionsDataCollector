@@ -16,6 +16,7 @@ namespace GitHubActionsDataCollector.Mappings
             Map(x => x.StartedAtUtc);
             Map(x => x.CompletedAtUtc);
             Map(x => x.Url);
+            References(x => x.WorkflowRun);
         }
     }
 }

@@ -6,7 +6,7 @@ namespace GitHubActionsDataCollector
 {
     public interface IWorkflowRunJobsProcessor
     {
-        public Task Process(string repoOwner, string repoName, long workflowRunId);
+        public Task<List<WorkflowRunJob>> Process(string repoOwner, string repoName, WorkflowRun workflowRun);
     }
 
     internal class WorkflowRunJobsProcessor : IWorkflowRunJobsProcessor
@@ -21,7 +21,7 @@ namespace GitHubActionsDataCollector
             _workflowRunJobsRepository = workflowRunJobsRepository;
         }
 
-        public async Task Process(string repoOwner, string repoName, long workflowRunId)
+        public async Task<List<WorkflowRunJob>> Process(string repoOwner, string repoName, WorkflowRun workflowRun)
         {
             var workflowJobs = new List<WorkflowRunJob>();
             var resultsPerPage = 4;
@@ -39,7 +39,7 @@ namespace GitHubActionsDataCollector
             {
                 pageNumber++;
 
-                var workflowRunJobs = await _gitHubActionsApiClient.GetJobsForWorkflowRun(repoOwner, repoName, workflowRunId, pageNumber, resultsPerPage);
+                var workflowRunJobs = await _gitHubActionsApiClient.GetJobsForWorkflowRun(repoOwner, repoName, workflowRun.RunId, pageNumber, resultsPerPage);
                 totalResults = workflowRunJobs.total_count;
 
                 foreach (var job in workflowRunJobs.jobs)
@@ -59,7 +59,8 @@ namespace GitHubActionsDataCollector
                             Conclusion = job.conclusion,
                             Url = job.html_url,
                             StartedAtUtc = DateTime.Parse(job.started_at),
-                            CompletedAtUtc = DateTime.Parse(job.completed_at)
+                            CompletedAtUtc = DateTime.Parse(job.completed_at),
+                            WorkflowRun = workflowRun
                         }
                     );
 
@@ -76,7 +77,9 @@ namespace GitHubActionsDataCollector
             // we'll need to processs this file and look for the test results in each log
             // we'll need to be able to configure which jobs and which steps in each job contain test logs and what type of logs these are
             // or we can allow the user to write a custom class to deal with these
-            _workflowRunJobsRepository.SaveJobs(workflowJobs);
+            // _workflowRunJobsRepository.SaveJobs(workflowJobs);
+
+            return workflowJobs;
         }
 
         private string GenerateJobKey(WorkflowRunJobDto job)

@@ -5,7 +5,7 @@ namespace GitHubActionsDataCollector.Repositories
 {
     public interface IRegisteredWorkflowRepository
     {
-        public Task<RegisteredWorkflow> GetNextWorkflow();
+        public Task<RegisteredWorkflow> GetLeastRecentlyCheckedWorkflow();
     }
 
     public class RegisteredWorkflowRepository : IRegisteredWorkflowRepository
@@ -17,7 +17,7 @@ namespace GitHubActionsDataCollector.Repositories
             _sessionFactory = sessionFactory;
         }
 
-        public async Task<RegisteredWorkflow> GetNextWorkflow()
+        public async Task<RegisteredWorkflow> GetLeastRecentlyCheckedWorkflow()
         {
             using (var session = _sessionFactory.OpenSession())
             {
@@ -28,7 +28,14 @@ namespace GitHubActionsDataCollector.Repositories
                                                 .SingleOrDefaultAsync();
                     transaction.Commit();
 
-                    Console.WriteLine($"Retrieved workflow:{workflow.Id}");
+                    if(workflow == null)
+                    {
+                        Console.WriteLine("No registered workflows to process");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Retrieved workflow:{workflow.Id}");
+                    }
 
                     return workflow;
                 }

@@ -28,37 +28,41 @@ namespace GitHubActionsDataCollector
             _gitHubActionsApiClient = gitHubActionsApiClient;
         }
 
-        public async Task Process(string owner, string repo, WorkflowRunDto workflowRun)
+        public async Task Process(string owner, string repo, WorkflowRunDto workflowRunDto)
         {
-            var createdAt = DateTime.Parse(workflowRun.created_at);
-            var updatedAt = DateTime.Parse(workflowRun.updated_at);
+            var createdAt = DateTime.Parse(workflowRunDto.created_at);
+            var updatedAt = DateTime.Parse(workflowRunDto.updated_at);
 
             var duration = updatedAt.Subtract(createdAt);
 
-            Console.WriteLine($"WorkflowRunId:{workflowRun.id} Title:{workflowRun.display_title} Duration:{duration} RunAttempts:{workflowRun.run_attempt} Conclusion:{workflowRun.conclusion}");
+            Console.WriteLine($"WorkflowRunId:{workflowRunDto.id} Title:{workflowRunDto.display_title} Duration:{duration} RunAttempts:{workflowRunDto.run_attempt} Conclusion:{workflowRunDto.conclusion}");
 
-            if (!ShouldProcessWorkflowRun(workflowRun))
+            if (!ShouldProcessWorkflowRun(workflowRunDto))
             {
-                Console.WriteLine($"Skipping WorkflowRunId:{workflowRun.id}");
+                Console.WriteLine($"Skipping WorkflowRunId:{workflowRunDto.id}");
                 return;
             }
 
-            _workflowRunRepository.SaveWorkflowRun(new WorkflowRun
+            var workflowRun = new WorkflowRun
             {
                 Owner = owner,
                 Repo = repo,
-                RunId = workflowRun.id,
-                WorkflowId = workflowRun.workflow_id,
-                WorkflowName = workflowRun.name,
+                RunId = workflowRunDto.id,
+                WorkflowId = workflowRunDto.workflow_id,
+                WorkflowName = workflowRunDto.name,
                 CompletedAtUtc = updatedAt,
                 StartedAtUtc = createdAt,
-                Title = workflowRun.display_title,
-                Conclusion = workflowRun.conclusion,
-                Url = workflowRun.html_url,
-                NumAttempts = workflowRun.run_attempt
-            });
+                Title = workflowRunDto.display_title,
+                Conclusion = workflowRunDto.conclusion,
+                Url = workflowRunDto.html_url,
+                NumAttempts = workflowRunDto.run_attempt
+            };
 
-            await _workflowRunJobsProcessor.Process(owner, repo, workflowRun.id);
+            var jobs = await _workflowRunJobsProcessor.Process(owner, repo, workflowRun);
+
+            workflowRun.Jobs = jobs;
+
+            _workflowRunRepository.SaveWorkflowRun(workflowRun);
         }
 
         private bool ShouldProcessWorkflowRun(WorkflowRunDto workflowRun)

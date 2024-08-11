@@ -14,5 +14,11 @@
         public virtual DateTime CompletedAtUtc { get; set; }
         public virtual int NumAttempts { get; set; } // will this end up being a computed value instead?
         public virtual string Conclusion { get; set; }
+        public virtual IList<WorkflowRunJob> Jobs { get; set; }
+
+        public WorkflowRun()
+        {
+            Jobs = new List<WorkflowRunJob>();
+        }
     }
 }

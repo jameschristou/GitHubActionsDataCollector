@@ -7,6 +7,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NHibernate.Driver;
 using NHibernate;
+using NHibernate.Tool.hbm2ddl;
+using NHibernate.Cfg;
 
 using IHost host = CreateHostBuilder(args).Build();
 using var scope = host.Services.CreateScope();
@@ -17,7 +19,7 @@ try
 {
     // get the workflow to process
     // TODO enable processing of multiple workflows in a single execution of this application
-    var workflow = await services.GetRequiredService<IRegisteredWorkflowRepository>().GetNextWorkflow();
+    var workflow = await services.GetRequiredService<IRegisteredWorkflowRepository>().GetLeastRecentlyCheckedWorkflow();
 
     if (workflow == null)
     {

@@ -24,10 +24,9 @@ TODO
 * Loop through the workflow runs and implement paging (DONE)
 * Have a registration of workflows that we process rather than having this hardcoded (DONE)
 * Link the WorkflowRun and WorkflowRunJob tables through the Id column on WorkflowRun (DONE)
-* When starting the processing, pick up where we left off by checking the last workflow run processed - we'll need to link WorkflowRun and RegsiteredWorkflow for this
-* Add audit date columns onto the RegisteredWorkflow and WorkflowRun tables
+* When starting the processing, pick up where we left off by checking the last workflow run processed - we'll need to link WorkflowRun and RegsiteredWorkflow for this (DONE)
 * Add unit tests and run the unit tests in the workflow for GitHubActionsDataCollector
-
+* Add audit date columns onto the RegisteredWorkflow and WorkflowRun tables
 
 ## Phase 6
 * We start interrogating the workflow run logs to get details on test results. We make this flexible so people can write their own custom log processor. Built in support for processing logs form XUnit.

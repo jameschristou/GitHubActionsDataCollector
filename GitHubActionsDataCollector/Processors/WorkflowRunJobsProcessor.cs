@@ -2,7 +2,7 @@
 using GitHubActionsDataCollector.Entities;
 using GitHubActionsDataCollector.Repositories;
 
-namespace GitHubActionsDataCollector
+namespace GitHubActionsDataCollector.Processors
 {
     public interface IWorkflowRunJobsProcessor
     {

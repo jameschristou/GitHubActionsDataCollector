@@ -25,12 +25,12 @@ TODO
 * Have a registration of workflows that we process rather than having this hardcoded (DONE)
 * Link the WorkflowRun and WorkflowRunJob tables through the Id column on WorkflowRun (DONE)
 * When starting the processing, pick up where we left off by checking the last workflow run processed - we'll need to link WorkflowRun and RegsiteredWorkflow for this
+* Add audit date columns onto the RegisteredWorkflow and WorkflowRun tables
 * Add unit tests and run the unit tests in the workflow for GitHubActionsDataCollector
-* Add audit date columns
-* Write everything for a workflow run in one go. That way if something goes wrong we don't write the records and we pick it up again next time
+
 
 ## Phase 6
 * We start interrogating the workflow run logs to get details on test results. We make this flexible so people can write their own custom log processor. Built in support for processing logs form XUnit.
 
 ## Phase 7
-* Set this up to run as a container in AWS Lambda on a regular schedule
+Set this up to run as a container in AWS Lambda on a regular schedule

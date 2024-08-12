@@ -1,6 +1,5 @@
 ﻿using FluentNHibernate.Cfg.Db;
 using FluentNHibernate.Cfg;
-using GitHubActionsDataCollector;
 using GitHubActionsDataCollector.GitHubActionsApiClient;
 using GitHubActionsDataCollector.Repositories;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,6 +8,8 @@ using NHibernate.Driver;
 using NHibernate;
 using NHibernate.Tool.hbm2ddl;
 using NHibernate.Cfg;
+using GitHubActionsDataCollector.Processors;
+using GitHubActionsDataCollector;
 
 using IHost host = CreateHostBuilder(args).Build();
 using var scope = host.Services.CreateScope();
@@ -17,17 +18,7 @@ var services = scope.ServiceProvider;
 
 try
 {
-    // get the workflow to process
-    // TODO enable processing of multiple workflows in a single execution of this application
-    var workflow = await services.GetRequiredService<IRegisteredWorkflowRepository>().GetLeastRecentlyCheckedWorkflow();
-
-    if (workflow == null)
-    {
-        Console.WriteLine("No workflows to process!");
-        return;
-    }
-
-    await services.GetRequiredService<WorkflowProcessor>().Process(workflow);
+    await services.GetRequiredService<Processor>().Run();
 }
 catch (Exception e)
 {
@@ -48,7 +39,8 @@ IHostBuilder CreateHostBuilder(string[] strings)
             services.AddTransient<IWorkflowRunRepository, WorkflowRunRepository>();
             services.AddTransient<IWorkflowRunJobsRepository, WorkflowRunJobsRepository>();
             services.AddTransient<IRegisteredWorkflowRepository, RegisteredWorkflowRepository>();
-            services.AddSingleton<WorkflowProcessor>();
+            services.AddTransient<IRegisteredWorkflowProcessor, RegisteredWorkflowProcessor>();
+            services.AddSingleton<Processor>();
 
             // NHibernate session factory registration
             services.AddSingleton<ISessionFactory>(CreateNHibernateSessionFactory());
@@ -64,5 +56,15 @@ ISessionFactory CreateNHibernateSessionFactory()
             .ConnectionString("Server=.\\SQLEXPRESS;Database=GHAData;Integrated Security=True;Encrypt=false"))
       .Mappings(m =>
         m.FluentMappings.AddFromAssemblyOf<Program>())
+      //.ExposeConfiguration(BuildSchema) // only uncomment this line to generate the schema. However this will drop existing tables and recreate them
       .BuildSessionFactory();
+}
+
+void BuildSchema(Configuration config)
+{
+    // this NHibernate tool takes a configuration (with mapping info in)
+    // and exports a database schema from it. This basically drops the existing
+    // tables and recreates them so be careful when using this!
+    new SchemaExport(config)
+      .Create(false, true);
 }

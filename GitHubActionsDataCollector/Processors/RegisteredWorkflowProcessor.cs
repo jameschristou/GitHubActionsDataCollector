@@ -1,14 +1,21 @@
 ﻿using GitHubActionsDataCollector.Entities;
 using GitHubActionsDataCollector.GitHubActionsApiClient;
 
-namespace GitHubActionsDataCollector
+namespace GitHubActionsDataCollector.Processors
 {
-    internal class WorkflowProcessor
+    public interface IRegisteredWorkflowProcessor
+    {
+        public Task Process(RegisteredWorkflow registeredWorkflow);
+    }
+
+    public class RegisteredWorkflowProcessor : IRegisteredWorkflowProcessor
     {
         private readonly IWorkflowRunProcessor _workflowRunProcessor;
         private readonly IGitHubActionsApiClient _gitHibActionsApiClient;
+        private const int MaxBatchSize = 2;
+        private const int ResultsPerPage = 1;
 
-        public WorkflowProcessor(IWorkflowRunProcessor workflowRunProcessor, IGitHubActionsApiClient gitHibActionsApiClient)
+        public RegisteredWorkflowProcessor(IWorkflowRunProcessor workflowRunProcessor, IGitHubActionsApiClient gitHibActionsApiClient)
         {
             _workflowRunProcessor = workflowRunProcessor;
             _gitHibActionsApiClient = gitHibActionsApiClient;
@@ -16,10 +23,7 @@ namespace GitHubActionsDataCollector
 
         public async Task Process(RegisteredWorkflow registeredWorkflow)
         {
-            // hardcode the workflowId for now
             var pageNumber = 0;
-            var resultsPerPage = 1;
-            var maxBatchSize = 2;
             int numProcessed = 0;
             int totalResults;
 
@@ -27,18 +31,18 @@ namespace GitHubActionsDataCollector
             {
                 pageNumber++;
 
-                var workflowRuns = await _gitHibActionsApiClient.GetWorkflowRuns(registeredWorkflow.Owner, registeredWorkflow.Repo, registeredWorkflow.WorkflowId, DateTime.Now.AddDays(-2), pageNumber, resultsPerPage);
+                var workflowRuns = await _gitHibActionsApiClient.GetWorkflowRuns(registeredWorkflow.Owner, registeredWorkflow.Repo, registeredWorkflow.WorkflowId, DateTime.Now.AddDays(-2), pageNumber, ResultsPerPage);
                 totalResults = workflowRuns.total_count;
 
                 // then process each workflow run returned
                 foreach (var workflowRun in workflowRuns.workflow_runs)
                 {
-                    await _workflowRunProcessor.Process(registeredWorkflow.Owner, registeredWorkflow.Repo, workflowRun);
+                    await _workflowRunProcessor.Process(registeredWorkflow, workflowRun);
                 }
 
                 numProcessed++;
             }
-            while (numProcessed < maxBatchSize && pageNumber * resultsPerPage < totalResults);
+            while (numProcessed < MaxBatchSize && pageNumber * ResultsPerPage < totalResults);
         }
     }
 }

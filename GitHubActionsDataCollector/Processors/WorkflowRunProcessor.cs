@@ -2,11 +2,11 @@
 using GitHubActionsDataCollector.Entities;
 using GitHubActionsDataCollector.Repositories;
 
-namespace GitHubActionsDataCollector
+namespace GitHubActionsDataCollector.Processors
 {
     public interface IWorkflowRunProcessor
     {
-        public Task Process(string repoOwner, string repoName, WorkflowRunDto workflowRun);
+        public Task Process(RegisteredWorkflow registeredWorkflow, WorkflowRunDto workflowRun);
     }
 
     /**
@@ -28,7 +28,7 @@ namespace GitHubActionsDataCollector
             _gitHubActionsApiClient = gitHubActionsApiClient;
         }
 
-        public async Task Process(string owner, string repo, WorkflowRunDto workflowRunDto)
+        public async Task Process(RegisteredWorkflow registeredWorkflow, WorkflowRunDto workflowRunDto)
         {
             var createdAt = DateTime.Parse(workflowRunDto.created_at);
             var updatedAt = DateTime.Parse(workflowRunDto.updated_at);
@@ -45,8 +45,8 @@ namespace GitHubActionsDataCollector
 
             var workflowRun = new WorkflowRun
             {
-                Owner = owner,
-                Repo = repo,
+                Owner = registeredWorkflow.Owner,
+                Repo = registeredWorkflow.Repo,
                 RunId = workflowRunDto.id,
                 WorkflowId = workflowRunDto.workflow_id,
                 WorkflowName = workflowRunDto.name,
@@ -58,16 +58,20 @@ namespace GitHubActionsDataCollector
                 NumAttempts = workflowRunDto.run_attempt
             };
 
-            var jobs = await _workflowRunJobsProcessor.Process(owner, repo, workflowRun);
+            var jobs = await _workflowRunJobsProcessor.Process(registeredWorkflow.Owner, registeredWorkflow.Repo, workflowRun);
 
             workflowRun.Jobs = jobs;
+
+            // update the registered workflow so we keep track of when this was last checked
+            registeredWorkflow.LastCheckedAtUtc = DateTime.UtcNow;
+            workflowRun.RegisteredWorkflow = registeredWorkflow;
 
             _workflowRunRepository.SaveWorkflowRun(workflowRun);
         }
 
         private bool ShouldProcessWorkflowRun(WorkflowRunDto workflowRun)
         {
-            if (String.Equals("success", workflowRun.conclusion, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals("success", workflowRun.conclusion, StringComparison.OrdinalIgnoreCase))
                 return true;
 
             return false;

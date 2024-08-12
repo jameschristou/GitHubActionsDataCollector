@@ -26,6 +26,7 @@ namespace GitHubActionsDataCollector.Repositories
                     var workflow = await session.QueryOver<RegisteredWorkflow>()
                                                 .OrderBy(x => x.LastCheckedAtUtc).Desc
                                                 .SingleOrDefaultAsync();
+
                     transaction.Commit();
 
                     if(workflow == null)

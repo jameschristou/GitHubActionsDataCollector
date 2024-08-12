@@ -23,22 +23,29 @@ namespace GitHubActionsDataCollector.Repositories
             {
                 using (var transaction = session.BeginTransaction())
                 {
-                    var workflow = await session.QueryOver<RegisteredWorkflow>()
-                                                .OrderBy(x => x.LastCheckedAtUtc).Desc
+                    var registeredWorkflow = await session.QueryOver<RegisteredWorkflow>()
+                                                .OrderBy(x => x.LastCheckedAtUtc).Asc
+                                                .Take(1)
                                                 .SingleOrDefaultAsync();
 
-                    transaction.Commit();
-
-                    if(workflow == null)
+                    if(registeredWorkflow == null)
                     {
                         Console.WriteLine("No registered workflows to process");
                     }
                     else
                     {
-                        Console.WriteLine($"Retrieved workflow:{workflow.Id}");
+                        Console.WriteLine($"Retrieved workflow:{registeredWorkflow.Id}");
+
+                        registeredWorkflow.LastProcessedWorkflowRun = await session.QueryOver<WorkflowRun>()
+                                                .Where(x => x.RegisteredWorkflow.Id == registeredWorkflow.Id)
+                                                .OrderBy(x => x.Id).Desc
+                                                .Take(1)
+                                                .SingleOrDefaultAsync();
                     }
 
-                    return workflow;
+                    transaction.Commit();
+
+                    return registeredWorkflow;
                 }
             }
         }

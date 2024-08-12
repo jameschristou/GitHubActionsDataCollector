@@ -19,15 +19,15 @@ namespace GitHubActionsDataCollector
 
         public async Task Run()
         {
-            var workflow = await _registeredWorkflowRepository.GetLeastRecentlyCheckedWorkflow();
+            var registeredWorkflow = await _registeredWorkflowRepository.GetLeastRecentlyCheckedWorkflow();
 
-            if (workflow == null)
+            if (registeredWorkflow == null)
             {
                 Console.WriteLine("No workflows to process!");
                 return;
             }
 
-            await _registeredWorkflowProcessor.Process(workflow);
+            await _registeredWorkflowProcessor.Process(registeredWorkflow);
         }
     }
 }

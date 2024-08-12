@@ -12,7 +12,7 @@ namespace GitHubActionsDataCollector.Processors
     {
         private readonly IWorkflowRunProcessor _workflowRunProcessor;
         private readonly IGitHubActionsApiClient _gitHibActionsApiClient;
-        private const int MaxBatchSize = 2;
+        private const int MaxBatchSize = 3;
         private const int ResultsPerPage = 1;
 
         public RegisteredWorkflowProcessor(IWorkflowRunProcessor workflowRunProcessor, IGitHubActionsApiClient gitHibActionsApiClient)
@@ -27,11 +27,13 @@ namespace GitHubActionsDataCollector.Processors
             int numProcessed = 0;
             int totalResults;
 
+            var fromDate = registeredWorkflow.LastProcessedWorkflowRun != null ? registeredWorkflow.LastProcessedWorkflowRun.CompletedAtUtc : DateTime.MinValue;
+
             do
             {
                 pageNumber++;
 
-                var workflowRuns = await _gitHibActionsApiClient.GetWorkflowRuns(registeredWorkflow.Owner, registeredWorkflow.Repo, registeredWorkflow.WorkflowId, DateTime.Now.AddDays(-2), pageNumber, ResultsPerPage);
+                var workflowRuns = await _gitHibActionsApiClient.GetWorkflowRuns(registeredWorkflow.Owner, registeredWorkflow.Repo, registeredWorkflow.WorkflowId, fromDate, pageNumber, ResultsPerPage);
                 totalResults = workflowRuns.total_count;
 
                 // then process each workflow run returned

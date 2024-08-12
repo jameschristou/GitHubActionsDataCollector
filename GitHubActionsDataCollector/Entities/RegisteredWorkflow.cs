@@ -9,5 +9,6 @@
         public virtual string WorkflowName { get; set; }
         public virtual string Token { get; set; }
         public virtual DateTime LastCheckedAtUtc { get; set; }
+        public virtual WorkflowRun LastProcessedWorkflowRun { get; set; }
     }
 }

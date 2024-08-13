@@ -58,7 +58,7 @@ namespace GitHubActionsDataCollector.Processors
                 NumAttempts = workflowRunDto.run_attempt
             };
 
-            var jobs = await _workflowRunJobsProcessor.Process(registeredWorkflow.Owner, registeredWorkflow.Repo, workflowRun);
+            var jobs = await _workflowRunJobsProcessor.Process(registeredWorkflow.Owner, registeredWorkflow.Repo, registeredWorkflow.Token, workflowRun);
 
             workflowRun.Jobs = jobs;
 
@@ -71,7 +71,8 @@ namespace GitHubActionsDataCollector.Processors
 
         private bool ShouldProcessWorkflowRun(WorkflowRunDto workflowRun)
         {
-            if (string.Equals("success", workflowRun.conclusion, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals("success", workflowRun.conclusion, StringComparison.OrdinalIgnoreCase)
+                || string.Equals("failure", workflowRun.conclusion, StringComparison.OrdinalIgnoreCase))
                 return true;
 
             return false;

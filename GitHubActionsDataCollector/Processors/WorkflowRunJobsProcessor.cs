@@ -6,7 +6,7 @@ namespace GitHubActionsDataCollector.Processors
 {
     public interface IWorkflowRunJobsProcessor
     {
-        public Task<List<WorkflowRunJob>> Process(string repoOwner, string repoName, WorkflowRun workflowRun);
+        public Task<List<WorkflowRunJob>> Process(string repoOwner, string repoName, string token, WorkflowRun workflowRun);
     }
 
     internal class WorkflowRunJobsProcessor : IWorkflowRunJobsProcessor
@@ -21,10 +21,10 @@ namespace GitHubActionsDataCollector.Processors
             _workflowRunJobsRepository = workflowRunJobsRepository;
         }
 
-        public async Task<List<WorkflowRunJob>> Process(string repoOwner, string repoName, WorkflowRun workflowRun)
+        public async Task<List<WorkflowRunJob>> Process(string repoOwner, string repoName, string token, WorkflowRun workflowRun)
         {
             var workflowJobs = new List<WorkflowRunJob>();
-            var resultsPerPage = 4;
+            var resultsPerPage = 20;
             var pageNumber = 0;
             // we use the jobIndex to keep track of which jobs we have already seen (some jobs seem to be captured multiple times, even though
             // they are only run once). We can use {name}-{started_at}-{completed_at} as the key to ensure they are unique. This ensures we capture
@@ -39,7 +39,7 @@ namespace GitHubActionsDataCollector.Processors
             {
                 pageNumber++;
 
-                var workflowRunJobs = await _gitHubActionsApiClient.GetJobsForWorkflowRun(repoOwner, repoName, workflowRun.RunId, pageNumber, resultsPerPage);
+                var workflowRunJobs = await _gitHubActionsApiClient.GetJobsForWorkflowRun(repoOwner, repoName, token, workflowRun.RunId, pageNumber, resultsPerPage);
                 totalResults = workflowRunJobs.total_count;
 
                 foreach (var job in workflowRunJobs.jobs)

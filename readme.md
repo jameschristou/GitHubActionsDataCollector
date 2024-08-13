@@ -25,6 +25,7 @@ TODO
 * Have a registration of workflows that we process rather than having this hardcoded (DONE)
 * Link the WorkflowRun and WorkflowRunJob tables through the Id column on WorkflowRun (DONE)
 * When starting the processing, pick up where we left off by checking the last workflow run processed - we'll need to link WorkflowRun and RegsiteredWorkflow for this (DONE)
+* Because of (GHA API usage limits)[https://docs.github.com/en/actions/administering-github-actions/usage-limits-billing-and-administration] we want to make sure we limit how many calls are made in an hour. The X-RateLimit-Remaining response header could be useful.
 * Add unit tests and run the unit tests in the workflow for GitHubActionsDataCollector
 * Add audit date columns onto the RegisteredWorkflow and WorkflowRun tables
 

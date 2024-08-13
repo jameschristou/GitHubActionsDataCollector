@@ -24,7 +24,7 @@ namespace GitHubActionsDataCollector.Processors
         public async Task<List<WorkflowRunJob>> Process(string repoOwner, string repoName, string token, WorkflowRun workflowRun)
         {
             var workflowJobs = new List<WorkflowRunJob>();
-            var resultsPerPage = 20;
+            var resultsPerPage = 30;
             var pageNumber = 0;
             // we use the jobIndex to keep track of which jobs we have already seen (some jobs seem to be captured multiple times, even though
             // they are only run once). We can use {name}-{started_at}-{completed_at} as the key to ensure they are unique. This ensures we capture

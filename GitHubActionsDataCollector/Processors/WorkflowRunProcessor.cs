@@ -62,17 +62,14 @@ namespace GitHubActionsDataCollector.Processors
 
             workflowRun.Jobs = jobs;
 
-            // update the registered workflow so we keep track of when this was last checked
-            registeredWorkflow.LastCheckedAtUtc = DateTime.UtcNow;
-            workflowRun.RegisteredWorkflow = registeredWorkflow;
-
             _workflowRunRepository.SaveWorkflowRun(workflowRun);
         }
 
         private bool ShouldProcessWorkflowRun(WorkflowRunDto workflowRun)
         {
             if (string.Equals("success", workflowRun.conclusion, StringComparison.OrdinalIgnoreCase)
-                || string.Equals("failure", workflowRun.conclusion, StringComparison.OrdinalIgnoreCase))
+                || string.Equals("failure", workflowRun.conclusion, StringComparison.OrdinalIgnoreCase)
+                || string.Equals("cancelled", workflowRun.conclusion, StringComparison.OrdinalIgnoreCase))
                 return true;
 
             return false;

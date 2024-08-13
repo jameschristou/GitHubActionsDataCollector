@@ -20,7 +20,6 @@ namespace GitHubActionsDataCollector.Mappings
             Map(x => x.NumAttempts);
             Map(x => x.Conclusion);
             HasMany(x => x.Jobs).Inverse().Cascade.All();
-            References(x => x.RegisteredWorkflow).Cascade.All();
         }
     }
 }

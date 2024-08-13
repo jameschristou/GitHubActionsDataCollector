@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Headers;
+﻿using System.Globalization;
+using System.Net.Http.Headers;
 using System.Security.Policy;
 using System.Text.Json;
 
@@ -6,7 +7,7 @@ namespace GitHubActionsDataCollector.GitHubActionsApiClient
 {
     public interface IGitHubActionsApiClient
     {
-        Task<WorkflowRunListDto> GetWorkflowRuns(string repoOwner, string repoName, string token, long workflowId, DateTime fromDate, int pageNumber, int resultsPerPage);
+        Task<WorkflowRunListDto> GetWorkflowRuns(string repoOwner, string repoName, string token, long workflowId, DateTime fromDate, DateTime toDate, int pageNumber, int resultsPerPage);
         Task<WorkflowRunJobsListDto> GetJobsForWorkflowRun(string repoOwner, string repoName, string token, long workflowRunId, int pageNumber, int resultsPerPage);
     }
 
@@ -23,12 +24,13 @@ namespace GitHubActionsDataCollector.GitHubActionsApiClient
         /// <summary>
         /// Gets paged workflow runs for a given workflow
         /// </summary>
-        public async Task<WorkflowRunListDto> GetWorkflowRuns(string owner, string repo, string token, long workflowId, DateTime fromDate, int pageNumber, int resultsPerPage)
+        public async Task<WorkflowRunListDto> GetWorkflowRuns(string owner, string repo, string token, long workflowId, DateTime fromDate, DateTime toDate, int pageNumber, int resultsPerPage)
         {
-            // [Get workflow runs for a workflow](https://docs.github.com/en/rest/actions/workflow-runs?apiVersion=2022-11-28#list-workflow-runs-for-a-workflow)
-            var url = $"{baseUrl}/repos/{owner}/{repo}/actions/workflows/{workflowId}/runs?per_page={resultsPerPage}&page={pageNumber}&created:>{fromDate}";
+            var fromDateFormatted = fromDate.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture);
+            var toDateFormatted = toDate.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture);
 
-            // TODO: add filtering by date created:> and also by 
+            // [Get workflow runs for a workflow](https://docs.github.com/en/rest/actions/workflow-runs?apiVersion=2022-11-28#list-workflow-runs-for-a-workflow)
+            var url = $"{baseUrl}/repos/{owner}/{repo}/actions/workflows/{workflowId}/runs?per_page={resultsPerPage}&page={pageNumber}&created={fromDateFormatted}..{toDateFormatted}";
 
             var response = await _httpClient.SendAsync(BuildRequest(url, token));
 

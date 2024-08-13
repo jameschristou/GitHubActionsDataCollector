@@ -6,6 +6,7 @@ namespace GitHubActionsDataCollector.Repositories
     public interface IRegisteredWorkflowRepository
     {
         public Task<RegisteredWorkflow> GetLeastRecentlyCheckedWorkflow();
+        public Task Update(RegisteredWorkflow registeredWorkflow);
     }
 
     public class RegisteredWorkflowRepository : IRegisteredWorkflowRepository
@@ -35,17 +36,24 @@ namespace GitHubActionsDataCollector.Repositories
                     else
                     {
                         Console.WriteLine($"Retrieved workflow:{registeredWorkflow.Id}");
-
-                        registeredWorkflow.LastProcessedWorkflowRun = await session.QueryOver<WorkflowRun>()
-                                                .Where(x => x.RegisteredWorkflow.Id == registeredWorkflow.Id)
-                                                .OrderBy(x => x.Id).Desc
-                                                .Take(1)
-                                                .SingleOrDefaultAsync();
                     }
 
                     transaction.Commit();
 
                     return registeredWorkflow;
+                }
+            }
+        }
+
+        public async Task Update(RegisteredWorkflow registeredWorkflow)
+        {
+            using (var session = _sessionFactory.OpenSession())
+            {
+                using (var transaction = session.BeginTransaction())
+                {
+                    await session.UpdateAsync(registeredWorkflow);
+
+                    transaction.Commit();
                 }
             }
         }

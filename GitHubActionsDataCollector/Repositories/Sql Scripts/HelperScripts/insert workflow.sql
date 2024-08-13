@@ -4,7 +4,8 @@ INSERT INTO dbo.RegisteredWorkflow (
     WorkflowId,
     WorkflowName,
     Token,
-    LastCheckedAtUtc
+    LastCheckedAtUtc,
+	ProcessedUntilUtc
 )
 VALUES
 (
@@ -13,5 +14,6 @@ VALUES
 	111639860,
 	'build',
 	'',
-	GETUTCDATE()
+	GETUTCDATE(),
+	'2024-07-01'
 )

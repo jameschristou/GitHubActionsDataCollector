@@ -5,7 +5,7 @@ namespace GitHubActionsDataCollector.Repositories
 {
     public interface IWorkflowRunRepository
     {
-        public void SaveWorkflowRun(WorkflowRun workflowRun);
+        public Task SaveWorkflowRun(WorkflowRun workflowRun);
     }
 
     public class WorkflowRunRepository : IWorkflowRunRepository
@@ -17,13 +17,13 @@ namespace GitHubActionsDataCollector.Repositories
             _sessionFactory = sessionFactory;
         }
 
-        public void SaveWorkflowRun(WorkflowRun workflowRun)
+        public async Task SaveWorkflowRun(WorkflowRun workflowRun)
         {
             using (var session = _sessionFactory.OpenSession())
             {
                 using (var transaction = session.BeginTransaction())
                 {
-                    session.Save(workflowRun);
+                    await session.SaveAsync(workflowRun);
                     transaction.Commit();
                 }
             }

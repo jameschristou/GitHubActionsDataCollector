@@ -14,6 +14,7 @@ namespace GitHubActionsDataCollector.Mappings
             Map(x => x.WorkflowName);
             Map(x => x.Token);
             Map(x => x.LastCheckedAtUtc);
+            Map(x => x.ProcessedUntilUtc);
         }
     }
 }

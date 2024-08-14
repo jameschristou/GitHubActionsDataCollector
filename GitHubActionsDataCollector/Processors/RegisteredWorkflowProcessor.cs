@@ -32,7 +32,8 @@ namespace GitHubActionsDataCollector.Processors
             var pageNumber = 0;
             int totalResults;
 
-            var fromDate = registeredWorkflow.ProcessedUntilUtc;
+            // we add one second to avoid retrieving the last processed workflow again
+            var fromDate = registeredWorkflow.ProcessedUntilUtc.AddSeconds(1);
             var toDate = fromDate.AddHours(SearchWindowInHours);
             var processedUntilDate = toDate;
 

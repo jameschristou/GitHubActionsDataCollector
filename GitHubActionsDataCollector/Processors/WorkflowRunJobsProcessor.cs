@@ -44,6 +44,12 @@ namespace GitHubActionsDataCollector.Processors
 
                 foreach (var job in workflowRunJobs.jobs)
                 {
+                    if (!ShouldProcessJob(job))
+                    {
+                        Console.WriteLine($"Skipping job: {job.id} {job.name}");
+                        continue;
+                    }
+
                     var jobKey = GenerateJobKey(job);
 
                     // don't add again if we've seen this job before
@@ -85,6 +91,14 @@ namespace GitHubActionsDataCollector.Processors
         private string GenerateJobKey(WorkflowRunJobDto job)
         {
             return $"{job.name}-{job.started_at}-{job.completed_at}";
+        }
+
+        private bool ShouldProcessJob(WorkflowRunJobDto job)
+        {
+            if (string.Equals("skipped", job.conclusion, StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            return true;
         }
     }
 }

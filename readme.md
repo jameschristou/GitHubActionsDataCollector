@@ -25,13 +25,26 @@ TODO
 * Have a registration of workflows that we process rather than having this hardcoded (DONE)
 * Link the WorkflowRun and WorkflowRunJob tables through the Id column on WorkflowRun (DONE)
 * When starting the processing, pick up where we left off by checking the last workflow run processed - we'll need to link WorkflowRun and RegsiteredWorkflow for this (DONE)
-* Introduce job groups to group related jobs
-* Because of (GHA API usage limits)[https://docs.github.com/en/actions/administering-github-actions/usage-limits-billing-and-administration] we want to make sure we limit how many calls are made in an hour. The X-RateLimit-Remaining response header could be useful.
-* Add unit tests and run the unit tests in the workflow for GitHubActionsDataCollector
+* Ignore skipped jobs (DONE)
+* Add new fields for determining the duration of a run. This is because some runs which are not complete will time out and the completed date is updated at this point. It would be better to use the run start time and the completed time of the last non skipped job to determine duration.
 * Add audit date columns onto the RegisteredWorkflow and WorkflowRun tables
 
 ## Phase 6
-* We start interrogating the workflow run logs to get details on test results. We make this flexible so people can write their own custom log processor. Built in support for processing logs form XUnit.
+Introduce job groups for grouping related jobs. Job groups should also have duration and conclusion info
+* Introduce job groups
+* Each run has job groups and each job belongs to a job group (is this true in simple workflows??)
 
 ## Phase 7
+We start interrogating the workflow run logs to get details on test results. We make this flexible so people can write their own custom log processor
+* Add XUnit tests and run the unit tests in the workflow for GitHubActionsDataCollector
+* Add the ability to record individual test results (status, duration, error messages, etc)
+* Extract and record test results for XUnit tests
+* Extract and record test results for Cypress tests
+* 
+
+## Phase 8
+Look at defending against exceeding Github API limits
+* Because of (GHA API usage limits)[https://docs.github.com/en/actions/administering-github-actions/usage-limits-billing-and-administration] we want to make sure we limit how many calls are made in an hour. The X-RateLimit-Remaining response header could be useful.
+
+## Phase 9
 Set this up to run as a container in AWS Lambda on a regular schedule

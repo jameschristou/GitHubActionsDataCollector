@@ -43,12 +43,12 @@ namespace GitHubActionsDataCollector.Processors
                 var workflowRuns = await _gitHibActionsApiClient.GetWorkflowRuns(registeredWorkflow.Owner, registeredWorkflow.Repo, registeredWorkflow.Token, registeredWorkflow.WorkflowId, fromDate, toDate, pageNumber, ResultsPerPage);
                 totalResults = workflowRuns.total_count;
 
-                // then process each workflow run returned
-                foreach (var workflowRun in workflowRuns.workflow_runs)
+                // for some reason, the results from the API are always sorted in DESC created order. We want ASC so that we always process oldest first
+                foreach (var workflowRun in workflowRuns.workflow_runs.OrderBy(x => x.created_at))
                 {
                     await _workflowRunProcessor.Process(registeredWorkflow, workflowRun);
 
-                    processedUntilDate = DateTime.Parse(workflowRun.created_at);
+                    processedUntilDate = DateTime.Parse(workflowRun.created_at, null, System.Globalization.DateTimeStyles.RoundtripKind);
                 }
             }
             while (pageNumber < MaxBatchSize && pageNumber * ResultsPerPage < totalResults);

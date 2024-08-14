@@ -64,8 +64,8 @@ namespace GitHubActionsDataCollector.Processors
                             Name = job.name,
                             Conclusion = job.conclusion,
                             Url = job.html_url,
-                            StartedAtUtc = DateTime.Parse(job.started_at),
-                            CompletedAtUtc = DateTime.Parse(job.completed_at),
+                            StartedAtUtc = DateTime.Parse(job.started_at, null, System.Globalization.DateTimeStyles.RoundtripKind),
+                            CompletedAtUtc = DateTime.Parse(job.completed_at, null, System.Globalization.DateTimeStyles.RoundtripKind),
                             WorkflowRun = workflowRun
                         }
                     );

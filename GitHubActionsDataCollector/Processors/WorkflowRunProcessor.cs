@@ -30,8 +30,8 @@ namespace GitHubActionsDataCollector.Processors
 
         public async Task Process(RegisteredWorkflow registeredWorkflow, WorkflowRunDto workflowRunDto)
         {
-            var createdAt = DateTime.Parse(workflowRunDto.created_at);
-            var updatedAt = DateTime.Parse(workflowRunDto.updated_at);
+            var createdAt = DateTime.Parse(workflowRunDto.created_at, null, System.Globalization.DateTimeStyles.RoundtripKind);
+            var updatedAt = DateTime.Parse(workflowRunDto.updated_at, null, System.Globalization.DateTimeStyles.RoundtripKind);
 
             var duration = updatedAt.Subtract(createdAt);
 

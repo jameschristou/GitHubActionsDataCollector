@@ -95,7 +95,8 @@ namespace GitHubActionsDataCollector.Processors
 
         private bool ShouldProcessJob(WorkflowRunJobDto job)
         {
-            if (string.Equals("skipped", job.conclusion, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals("skipped", job.conclusion, StringComparison.OrdinalIgnoreCase)
+                || string.Equals("cancelled", job.conclusion, StringComparison.OrdinalIgnoreCase))
                 return false;
 
             return true;

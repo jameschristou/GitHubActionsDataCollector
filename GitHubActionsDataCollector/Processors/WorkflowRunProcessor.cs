@@ -62,7 +62,10 @@ namespace GitHubActionsDataCollector.Processors
 
             workflowRun.Jobs = jobs;
 
-            _workflowRunRepository.SaveWorkflowRun(workflowRun);
+            if (ShouldSaveWorkflowRun(workflowRun))
+            {
+                await _workflowRunRepository.SaveWorkflowRun(workflowRun);
+            }
         }
 
         private bool ShouldProcessWorkflowRun(WorkflowRunDto workflowRun)
@@ -70,8 +73,22 @@ namespace GitHubActionsDataCollector.Processors
             if (string.Equals("success", workflowRun.conclusion, StringComparison.OrdinalIgnoreCase)
                 || string.Equals("failure", workflowRun.conclusion, StringComparison.OrdinalIgnoreCase)
                 || string.Equals("cancelled", workflowRun.conclusion, StringComparison.OrdinalIgnoreCase))
+            {
                 return true;
+            }
 
+            return false;
+        }
+
+        private bool ShouldSaveWorkflowRun(WorkflowRun workflowRun)
+        {
+            if (workflowRun.Jobs.Any(x => string.Equals("success", x.Conclusion, StringComparison.OrdinalIgnoreCase)
+                                            || string.Equals("failure", x.Conclusion, StringComparison.OrdinalIgnoreCase)))
+            {
+                return true;
+            }
+
+            // we don't save runs where no jobs had success or failure
             return false;
         }
     }

@@ -26,6 +26,7 @@ TODO
 * Link the WorkflowRun and WorkflowRunJob tables through the Id column on WorkflowRun (DONE)
 * When starting the processing, pick up where we left off by checking the last workflow run processed - we'll need to link WorkflowRun and RegsiteredWorkflow for this (DONE)
 * Ignore skipped jobs (DONE)
+* Ignore runs where all jobs are either skipped or cancelled (DONE)
 * Add new fields for determining the duration of a run. This is because some runs which are not complete will time out and the completed date is updated at this point. It would be better to use the run start time and the completed time of the last non skipped job to determine duration.
 * Add audit date columns onto the RegisteredWorkflow and WorkflowRun tables
 

@@ -24,7 +24,8 @@ namespace GitHubActionsDataCollector.GitHubActionsApiClient
         /// <summary>
         /// Gets paged workflow runs for a given workflow
         /// </summary>
-        public async Task<WorkflowRunListDto> GetWorkflowRuns(string owner, string repo, string token, long workflowId, DateTime fromDate, DateTime toDate, int pageNumber, int resultsPerPage)
+        public async Task<WorkflowRunListDto> GetWorkflowRuns(string owner, string repo, string token, long workflowId, DateTime fromDate, DateTime toDate, 
+                                                            int pageNumber, int resultsPerPage)
         {
             var fromDateFormatted = fromDate.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture);
             var toDateFormatted = toDate.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture);

@@ -1,4 +1,4 @@
-﻿namespace GitHubActionsDataCollector.GitHubActionsApiClient
+﻿namespace GitHubActionsDataCollector.GitHubActionsApi
 {
     public class WorkflowRunJobsListDto
     {

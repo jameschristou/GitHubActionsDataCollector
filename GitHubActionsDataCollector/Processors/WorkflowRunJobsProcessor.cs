@@ -1,4 +1,4 @@
-﻿using GitHubActionsDataCollector.GitHubActionsApiClient;
+﻿using GitHubActionsDataCollector.GitHubActionsApi;
 using GitHubActionsDataCollector.Entities;
 using GitHubActionsDataCollector.Repositories;
 

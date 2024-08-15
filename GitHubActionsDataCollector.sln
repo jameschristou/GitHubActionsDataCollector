@@ -11,6 +11,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		readme.md = readme.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{8D150B33-2174-4CA0-8A62-AE0F29AFA390}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHubActionsDataCollector.UnitTests", "GitHubActionsDataCollector.UnitTests\GitHubActionsDataCollector.UnitTests.csproj", "{28A27747-FAA1-4E46-908A-5B726A89A70C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,9 +25,16 @@ Global
 		{C8EF4B43-58F6-468C-980D-1E71BD7EA44F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C8EF4B43-58F6-468C-980D-1E71BD7EA44F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C8EF4B43-58F6-468C-980D-1E71BD7EA44F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28A27747-FAA1-4E46-908A-5B726A89A70C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28A27747-FAA1-4E46-908A-5B726A89A70C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28A27747-FAA1-4E46-908A-5B726A89A70C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28A27747-FAA1-4E46-908A-5B726A89A70C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{28A27747-FAA1-4E46-908A-5B726A89A70C} = {8D150B33-2174-4CA0-8A62-AE0F29AFA390}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AFB6A317-6CA6-4009-84B7-A6EC05A1C280}

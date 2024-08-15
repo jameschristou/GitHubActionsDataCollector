@@ -3,7 +3,7 @@ using System.Net.Http.Headers;
 using System.Security.Policy;
 using System.Text.Json;
 
-namespace GitHubActionsDataCollector.GitHubActionsApiClient
+namespace GitHubActionsDataCollector.GitHubActionsApi
 {
     public interface IGitHubActionsApiClient
     {
@@ -11,7 +11,7 @@ namespace GitHubActionsDataCollector.GitHubActionsApiClient
         Task<WorkflowRunJobsListDto> GetJobsForWorkflowRun(string repoOwner, string repoName, string token, long workflowRunId, int pageNumber, int resultsPerPage);
     }
 
-    internal class GitHubActionsApiClient : IGitHubActionsApiClient
+    public class GitHubActionsApiClient : IGitHubActionsApiClient
     {
         private static string baseUrl = "https://api.github.com";
         private readonly HttpClient _httpClient;

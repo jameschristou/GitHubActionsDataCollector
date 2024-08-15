@@ -1,4 +1,4 @@
-﻿namespace GitHubActionsDataCollector.GitHubActionsApiClient
+﻿namespace GitHubActionsDataCollector.GitHubActionsApi
 {
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "dto object")]
     public class WorkflowRunListDto

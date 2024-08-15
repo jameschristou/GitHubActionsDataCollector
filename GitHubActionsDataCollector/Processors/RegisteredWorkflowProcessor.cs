@@ -1,5 +1,5 @@
 ﻿using GitHubActionsDataCollector.Entities;
-using GitHubActionsDataCollector.GitHubActionsApiClient;
+using GitHubActionsDataCollector.GitHubActionsApi;
 using GitHubActionsDataCollector.Repositories;
 
 namespace GitHubActionsDataCollector.Processors

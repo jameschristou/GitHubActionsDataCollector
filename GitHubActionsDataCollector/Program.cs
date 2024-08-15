@@ -1,6 +1,6 @@
 ﻿using FluentNHibernate.Cfg.Db;
 using FluentNHibernate.Cfg;
-using GitHubActionsDataCollector.GitHubActionsApiClient;
+using GitHubActionsDataCollector.GitHubActionsApi;
 using GitHubActionsDataCollector.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

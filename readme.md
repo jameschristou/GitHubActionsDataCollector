@@ -17,10 +17,8 @@ This project is a work in progress with multiple phases. We are currently in pha
 ## Phase 4 - DONE
 For each workflow run, we get details on each job and store this data
 
-## Phase 5 - IN PROGRESS
+## Phase 5 - DONE
 Drive the workflows to process from a SQL table and enable the process to restart from where it last got to
-
-TODO
 * Loop through the workflow runs and implement paging (DONE)
 * Have a registration of workflows that we process rather than having this hardcoded (DONE)
 * Link the WorkflowRun and WorkflowRunJob tables through the Id column on WorkflowRun (DONE)
@@ -28,7 +26,7 @@ TODO
 * Ignore skipped jobs (DONE)
 * Ignore runs where all jobs are either skipped or cancelled (DONE)
 * Some runs which are not complete will time out and the updated date for the run is updated at this point. It would be better to use the run start time and the completed time of the last non skipped job to determine the completion time of the run rather than updated date. (DONE)
-* Add audit date columns onto the RegisteredWorkflow and WorkflowRun tables to help track of when processing occurred
+* Add audit date columns onto the WorkflowRun table to help track of when processing occurred (DONE)
 
 ## Phase 6
 Introduce job groups for grouping related jobs. Job groups should also have duration and conclusion info

@@ -64,6 +64,7 @@ namespace GitHubActionsDataCollector.Processors
             if (ShouldSaveWorkflowRun(workflowRun))
             {
                 workflowRun.CompletedAtUtc = GetWorkflowRunCompletionTime(jobs);
+                workflowRun.ProcessedAtUtc = DateTime.UtcNow;
 
                 await _workflowRunRepository.SaveWorkflowRun(workflowRun);
             }

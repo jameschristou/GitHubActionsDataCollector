@@ -50,7 +50,6 @@ namespace GitHubActionsDataCollector.Processors
                 RunId = workflowRunDto.id,
                 WorkflowId = workflowRunDto.workflow_id,
                 WorkflowName = workflowRunDto.name,
-                CompletedAtUtc = updatedAt,
                 StartedAtUtc = createdAt,
                 Title = workflowRunDto.display_title,
                 Conclusion = workflowRunDto.conclusion,
@@ -64,6 +63,8 @@ namespace GitHubActionsDataCollector.Processors
 
             if (ShouldSaveWorkflowRun(workflowRun))
             {
+                workflowRun.CompletedAtUtc = GetWorkflowRunCompletionTime(jobs);
+
                 await _workflowRunRepository.SaveWorkflowRun(workflowRun);
             }
         }
@@ -90,6 +91,13 @@ namespace GitHubActionsDataCollector.Processors
 
             // we don't save runs where no jobs had success or failure
             return false;
+        }
+
+        private DateTime GetWorkflowRunCompletionTime(List<WorkflowRunJob> workflowRunJobs)
+        {
+            // the github actions api doesn't give us a date that the workflow finished running
+            // we get this by getting the completion time of the last job to complete or fail
+            return workflowRunJobs.OrderBy(x => x.CompletedAtUtc).Last().CompletedAtUtc;
         }
     }
 }

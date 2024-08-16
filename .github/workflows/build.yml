@@ -4,8 +4,8 @@ on: [push]
 
 jobs:
 
-  build_netcore:
-    name: Build/Test GitHubActionsDataCollector
+  build:
+    name: Build GitHubActionsDataCollector
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -15,7 +15,25 @@ jobs:
         run: dotnet --info
 
       - name: Restore GitHubActionsDataCollector.sln
-        # restoring the tests project will implicitly restore the core project
+        run: |
+          dotnet restore ./GitHubActionsDataCollector.sln --verbosity m
+
+      - name: Build GitHubActionsDataCollector.sln
+        run: |
+          dotnet build ./GitHubActionsDataCollector.sln --configuration Release --no-restore
+
+
+  test:
+    name: Test GitHubActionsDataCollector
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Output dotnet info
+        run: dotnet --info
+
+      - name: Restore GitHubActionsDataCollector.sln
         run: |
           dotnet restore ./GitHubActionsDataCollector.sln --verbosity m
 
@@ -25,4 +43,4 @@ jobs:
 
       - name: Test GitHubActionsDataCollector.sln
         run: |
-          dotnet test ./GitHubActionsDataCollector.sln --configuration Release '-l:trx;LogFileName=TestResults.xml' --no-build --filter "Category!=Manual"
+          dotnet test ./GitHubActionsDataCollector.sln --configuration Release --logger:"console;verbosity=detailed" '-l:trx;LogFileName=TestResults.xml' --no-build --filter --no-restore "Category!=Manual"

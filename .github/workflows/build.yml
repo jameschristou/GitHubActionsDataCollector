@@ -43,4 +43,4 @@ jobs:
 
       - name: Test GitHubActionsDataCollector.UnitTests
         run: |
-          dotnet test ./GitHubActionsDataCollector.UnitTests/GitHubActionsDataCollector.UnitTests.csproj --filter "Category!=Manual" --verbosity detailed
+          dotnet test ./GitHubActionsDataCollector.UnitTests/GitHubActionsDataCollector.UnitTests.csproj --configuration Release --no-restore --no-build --filter "Category!=Manual" --verbosity detailed

@@ -33,14 +33,14 @@ jobs:
       - name: Output dotnet info
         run: dotnet --info
 
-      - name: Restore GitHubActionsDataCollector.sln
+      - name: Restore GitHubActionsDataCollector.UnitTests
         run: |
-          dotnet restore ./GitHubActionsDataCollector.sln --verbosity m
+          dotnet restore ./GitHubActionsDataCollector.UnitTests/GitHubActionsDataCollector.UnitTests.csproj --verbosity m
 
-      - name: Build GitHubActionsDataCollector.sln
+      - name: Build GitHubActionsDataCollector.UnitTests
         run: |
-          dotnet build ./GitHubActionsDataCollector.sln --configuration Release --no-restore
+          dotnet build ./GitHubActionsDataCollector.UnitTests/GitHubActionsDataCollector.UnitTests.csproj --configuration Release --no-restore
 
-      - name: Test GitHubActionsDataCollector.sln
+      - name: Test GitHubActionsDataCollector.UnitTests
         run: |
           dotnet test ./GitHubActionsDataCollector.UnitTests/GitHubActionsDataCollector.UnitTests.csproj --no-build --filter "Category!=Manual" --no-restore --verbosity detailed

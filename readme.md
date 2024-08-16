@@ -32,13 +32,13 @@ Drive the workflows to process from a SQL table and enable the process to restar
 We start interrogating the workflow run logs to get details on test results. We make this flexible so people can write their own custom log processor
 * Add XUnit tests (DONE)
 * Run the unit tests in the workflow for GitHubActionsDataCollector
-* Add the ability to record individual test results (status, duration, error messages, etc)
+* Add the ability to record individual test results (status, duration, error messages, etc) - may need some config to determine which steps are tests (by name)
 * Extract and record test results for XUnit tests
 * Extract and record test results for Cypress tests
 
 ## Phase 7
 Introduce job groups for grouping related jobs. Job groups should also have duration and conclusion info
-* Introduce job groups
+* Introduce job groups - grouping could be configured through regex on job name
 * Each run has job groups and each job belongs to a job group (is this true in simple workflows??)
 
 ## Phase 8

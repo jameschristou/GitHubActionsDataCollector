@@ -43,4 +43,4 @@ jobs:
 
       - name: Test GitHubActionsDataCollector.sln
         run: |
-          dotnet test ./GitHubActionsDataCollector.sln --configuration Release --logger:'console;verbosity=detailed' '-l:trx;LogFileName=TestResults.xml' --no-build --filter --no-restore "Category!=Manual"
+          dotnet test ./GitHubActionsDataCollector.UnitTests/GitHubActionsDataCollector.UnitTests.csproj --no-build --filter "Category!=Manual" --no-restore --verbosity detailed

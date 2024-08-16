@@ -43,4 +43,11 @@ jobs:
 
       - name: Test GitHubActionsDataCollector.UnitTests
         run: |
-          dotnet test ./GitHubActionsDataCollector.UnitTests/GitHubActionsDataCollector.UnitTests.csproj --configuration Release --no-restore --no-build --filter "Category!=Manual" --verbosity detailed
+          dotnet test ./GitHubActionsDataCollector.UnitTests/GitHubActionsDataCollector.UnitTests.csproj --configuration Release --no-restore --no-build --filter "Category!=Manual" --verbosity normal '-l:trx;LogFileName=testresults-attempt-${{github.run_attempt}}.xml'
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+            name: Test Results for Attempt-${{github.run_attempt}}
+            path: ./GitHubActionsDataCollector.UnitTests/TestResults/testresults-attempt-${{github.run_attempt}}.xml

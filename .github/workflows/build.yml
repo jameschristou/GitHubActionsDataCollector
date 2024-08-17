@@ -51,18 +51,11 @@ jobs:
         run: |
             echo "Fail list: ${{steps.get_failed_tests.outputs.failed_tests}}"
             fail_list=${steps.get_failed_tests.outputs.failed_tests}
-            #echo "Number of failed tests: ${#fail_list[@]}"
+            
             tests_filter = "Category!=Manual" # default filter
-            # if [${#steps.get_failed_tests.outputs.failed_tests[@]} -gt 0]
-            # then
-            #     tests_filter = "" # reset the filter and get the failed tests
-            #     for failed_test in "${{steps.get_failed_tests.outputs.failed_tests[@]}}"; do
-            #         tests_filter+="failed_test, "
-            #     done
-            # fi
             
             tests_filter="${tests_filter%, }."  # Remove the trailing comma and space
-            echo "$tests_filter=$tests_filter" >> $GITHUB_OUTPUT
+            echo "tests_filter=$tests_filter" >> $GITHUB_OUTPUT
         shell: bash
 
       - name: Test GitHubActionsDataCollector.UnitTests

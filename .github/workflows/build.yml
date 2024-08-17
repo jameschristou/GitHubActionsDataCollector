@@ -51,7 +51,8 @@ jobs:
         id: update_test_filter
         run: |
             tests_filter=""
-            jq -c '.[]' ${{steps.get_failed_tests.outputs.failed_tests}} | while read failed_test; do
+
+            for failed_test in $(echo "${{steps.get_failed_tests.outputs.failed_tests}}" | jq -c '.[]); do
                 echo "Test found: ${failed_test}"
                 tests_filter+="FullyQualifiedName=${failed_test}|"
             done

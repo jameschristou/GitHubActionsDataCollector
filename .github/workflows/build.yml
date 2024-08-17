@@ -51,7 +51,7 @@ jobs:
         run: |
             echo "Fail list: ${{steps.get_failed_tests.outputs.failed_tests}}"
             tests_filter = "Category!=Manual" # default filter
-            if ${{#steps.get_failed_tests.outputs.failed_tests[@]}} > 0
+            if ${#steps.get_failed_tests.outputs.failed_tests[@]} > 0
             then
                 tests_filter = "" # reset the filter and get the failed tests
                 for failed_test in "${{steps.get_failed_tests.outputs.failed_tests[@]}}"; do

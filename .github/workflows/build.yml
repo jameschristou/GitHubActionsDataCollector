@@ -50,7 +50,7 @@ jobs:
       - name: Update test filter
         id: update_test_filter
         run: |
-            fail_list=${steps.get_failed_tests.outputs.failed_tests}
+            fail_list=${{steps.get_failed_tests.outputs.failed_tests}}
             echo "Fail list2: ${fail_list}"
             fail_list_count=${#fail_list[@]}
             echo "Fail list count: ${fail_list_count}"

@@ -41,6 +41,18 @@ jobs:
         run: |
           dotnet build ./GitHubActionsDataCollector.UnitTests/GitHubActionsDataCollector.UnitTests.csproj --configuration Release --no-restore
 
+      - name: Get failed tests
+        uses: jameschristou/actions-get-failed-tests-from-artifacts@aaf8bc7de9163bd70f99e5c1d6e84b41c33ca336
+        id: get_failed_tests
+        with:
+            name_of_the_test_run: "Test GitHubActionsDataCollector"
+
+      - name: Update test filter
+        run: |
+            echo "Fail list: ${{steps.get_failed_tests.outputs.failed_tests}}"
+            echo "tests_filter=${{steps.get_failed_tests.outputs.failed_tests}}" >> $GITHUB_OUTPUT
+        shell: bash
+
       - name: Test GitHubActionsDataCollector.UnitTests
         run: |
           dotnet test ./GitHubActionsDataCollector.UnitTests/GitHubActionsDataCollector.UnitTests.csproj --configuration Release --no-restore --no-build --filter "Category!=Manual" --verbosity normal '-l:trx;LogFileName=testresults-attempt-${{github.run_attempt}}.xml'
@@ -51,3 +63,8 @@ jobs:
         with:
             name: Test Results for Attempt-${{github.run_attempt}}
             path: ./GitHubActionsDataCollector.UnitTests/TestResults/testresults-attempt-${{github.run_attempt}}.xml
+
+      - name: Get failed tests
+        uses: jameschristou/actions-get-failed-tests-from-artifacts@aaf8bc7de9163bd70f99e5c1d6e84b41c33ca336
+        with:
+            name_of_the_test_run: "Test GitHubActionsDataCollector"

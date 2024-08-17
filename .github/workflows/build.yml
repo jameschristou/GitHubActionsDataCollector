@@ -51,7 +51,7 @@ jobs:
         run: |
             echo "Fail list: ${{steps.get_failed_tests.outputs.failed_tests}}"
             fail_list=${steps.get_failed_tests.outputs.failed_tests}
-            echo "Number of failed tests: ${#fail_list[@]}"
+            #echo "Number of failed tests: ${#fail_list[@]}"
             tests_filter = "Category!=Manual" # default filter
             # if [${#steps.get_failed_tests.outputs.failed_tests[@]} -gt 0]
             # then

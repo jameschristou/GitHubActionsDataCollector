@@ -52,10 +52,19 @@ jobs:
             echo "Fail list: ${{steps.get_failed_tests.outputs.failed_tests}}"
             fail_list=${{steps.get_failed_tests.outputs.failed_tests}}
             echo "Fail list2: ${fail_list}"
+            fail_list_count=${#fail_list[@]}
             
-            tests_filter = "Category!=Manual" # default filter
+            tests_filter="Category!=Manual" # default filter
+            if [$fail_list_count -gt 0]
+            then
+                tests_filter="" # reset the filter and get the failed tests
+                for failed_test in "${fail_list[@]}"; do
+                    tests_filter+="failed_test, "
+                done
+            fi
             
             tests_filter="${tests_filter%, }."  # Remove the trailing comma and space
+            echo "tests_filter:${tests_filter}"
             echo "tests_filter=$tests_filter" >> $GITHUB_OUTPUT
         shell: bash
 

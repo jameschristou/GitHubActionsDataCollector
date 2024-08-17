@@ -52,7 +52,7 @@ jobs:
         run: |
             tests_filter=""
 
-            for failed_test in $(${{steps.get_failed_tests.outputs.failed_tests}} | jq -c '.[]); do
+            for failed_test in $('${{steps.get_failed_tests.outputs.failed_tests}}' | jq -c '.[]); do
                 echo "Test found: ${failed_test}"
                 tests_filter+="FullyQualifiedName=${failed_test}|"
             done

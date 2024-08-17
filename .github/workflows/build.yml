@@ -51,13 +51,13 @@ jobs:
         id: update_test_filter
         run: |
             echo "Fail list: ${{steps.get_failed_tests.outputs.failed_tests}}"
-            fail_list=${{steps.get_failed_tests.outputs.failed_tests}}
+            fail_list=${steps.get_failed_tests.outputs.failed_tests}
             echo "Fail list2: ${fail_list}"
             fail_list_count=${#fail_list[@]}
             echo "Fail list count: ${fail_list_count}"
             
             tests_filter="Category!=Manual" # default filter
-            if [$fail_list_count -gt 0]; then
+            if [ $fail_list_count -gt 0 ]; then
                 tests_filter="" # reset the filter and get the failed tests
                 for failed_test in "${fail_list[@]}"; do
                     tests_filter+="FullyQualifiedName=${failed_test}|"

@@ -48,18 +48,19 @@ jobs:
             name_of_the_test_run: "Test GitHubActionsDataCollector"
 
       - name: Update test filter
+        id: update_test_filter
         run: |
             echo "Fail list: ${{steps.get_failed_tests.outputs.failed_tests}}"
             fail_list=${{steps.get_failed_tests.outputs.failed_tests}}
             echo "Fail list2: ${fail_list}"
             fail_list_count=${#fail_list[@]}
+            echo "Fail list count: ${fail_list_count}"
             
             tests_filter="Category!=Manual" # default filter
-            if [$fail_list_count -gt 0]
-            then
+            if [$fail_list_count -gt 0]; then
                 tests_filter="" # reset the filter and get the failed tests
                 for failed_test in "${fail_list[@]}"; do
-                    tests_filter+="failed_test, "
+                    tests_filter+="FullyQualifiedName=${failed_test}|"
                 done
             fi
             
@@ -70,7 +71,7 @@ jobs:
 
       - name: Test GitHubActionsDataCollector.UnitTests
         run: |
-          dotnet test ./GitHubActionsDataCollector.UnitTests/GitHubActionsDataCollector.UnitTests.csproj --configuration Release --no-restore --no-build --filter "Category!=Manual" --verbosity normal '-l:trx;LogFileName=testresults-attempt-${{github.run_attempt}}.xml'
+          dotnet test ./GitHubActionsDataCollector.UnitTests/GitHubActionsDataCollector.UnitTests.csproj --configuration Release --no-restore --no-build --filter "${{steps.update_test_filter.outputs.tests_filter}}" --verbosity normal '-l:trx;LogFileName=testresults-attempt-${{github.run_attempt}}.xml'
 
       - name: Upload test results
         if: always()

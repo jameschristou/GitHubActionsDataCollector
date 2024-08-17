@@ -50,7 +50,8 @@ jobs:
       - name: Update test filter
         run: |
             echo "Fail list: ${{steps.get_failed_tests.outputs.failed_tests}}"
-            fail_list=${steps.get_failed_tests.outputs.failed_tests}
+            fail_list=${{steps.get_failed_tests.outputs.failed_tests}}
+            echo "Fail list2: ${fail_list}"
             
             tests_filter = "Category!=Manual" # default filter
             

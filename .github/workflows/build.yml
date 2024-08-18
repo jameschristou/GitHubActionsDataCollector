@@ -50,15 +50,21 @@ jobs:
       - name: Update test filter
         id: update_test_filter
         run: |
-            tests_filter=""
+            tests_filter="Category!=Manual" # default if there's no failed tests from last attempt
 
-            for failed_test in $(echo '${{steps.get_failed_tests.outputs.failed_tests}}' | jq -r '.[]'); do
-                echo "Test found: ${failed_test}"
-                tests_filter+="FullyQualifiedName=${failed_test}|"
-            done
+            if [ "${{steps.get_failed_tests.outputs.failed_tests}}" != "[]" ]; then
+                echo "there are failed tests from last run attempt to process"
 
-            tests_filter="${tests_filter%?}"  # Remove the trailing |
+                tests_filter=""
 
+                for failed_test in $(echo '${{steps.get_failed_tests.outputs.failed_tests}}' | jq -r '.[]'); do
+                    echo "Test found: ${failed_test}"
+                    tests_filter+="FullyQualifiedName=${failed_test}|"
+                done
+
+                tests_filter="${tests_filter%?}"  # Remove the trailing |
+            fi
+            
             echo "tests_filter:${tests_filter}"
             echo "tests_filter=$tests_filter" >> $GITHUB_OUTPUT
         shell: bash

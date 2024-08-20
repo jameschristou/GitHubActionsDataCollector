@@ -31,7 +31,7 @@ Drive the workflows to process from a SQL table and enable the process to restar
 ## Phase 6 - IN PROGRESS
 We start interrogating the workflow run logs to get details on test results. We make this flexible so people can write their own custom log processor
 * Add XUnit tests (DONE)
-* Run the unit tests in the workflow for GitHubActionsDataCollector
+* Run the unit tests in the workflow for GitHubActionsDataCollector (DONE)
 * Add the ability to record individual test results (status, duration, error messages, etc) - may need some config to determine which steps are tests (by name)
 * Extract and record test results for XUnit tests
 * Extract and record test results for Cypress tests

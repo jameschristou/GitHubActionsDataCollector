@@ -14,8 +14,8 @@ namespace GitHubActionsDataCollector.Processors
         private readonly IWorkflowRunProcessor _workflowRunProcessor;
         private readonly IGitHubActionsApiClient _gitHibActionsApiClient;
         private readonly IRegisteredWorkflowRepository _registeredWorkflowRepository;
-        private const int MaxBatchSize = 3;
-        private const int ResultsPerPage = 4;
+        private const int MaxBatchSize = 4;
+        private const int ResultsPerPage = 10;
         private const int SearchWindowInHours = 24;
 
         public RegisteredWorkflowProcessor(IWorkflowRunProcessor workflowRunProcessor, 
@@ -49,7 +49,17 @@ namespace GitHubActionsDataCollector.Processors
                 {
                     await _workflowRunProcessor.Process(registeredWorkflow, workflowRun);
 
-                    processedUntilDate = DateTime.Parse(workflowRun.created_at, null, System.Globalization.DateTimeStyles.RoundtripKind);
+                    var createdAtUtc = DateTime.Parse(workflowRun.created_at, null, System.Globalization.DateTimeStyles.RoundtripKind);
+
+                    if (WorkflowRunIsInProgress(workflowRun))
+                    {
+                        // if workflow run is in progress then only update to right before the start of this run
+                        processedUntilDate = createdAtUtc.Subtract(new TimeSpan(0, 1, 0));
+                    }
+                    else
+                    {
+                        processedUntilDate = createdAtUtc;
+                    }
                 }
             }
             while (pageNumber < MaxBatchSize && pageNumber * ResultsPerPage < totalResults);
@@ -59,6 +69,11 @@ namespace GitHubActionsDataCollector.Processors
             registeredWorkflow.LastCheckedAtUtc = DateTime.UtcNow;
 
             await _registeredWorkflowRepository.Update(registeredWorkflow);
+        }
+
+        private bool WorkflowRunIsInProgress(WorkflowRunDto workflowRun)
+        {
+            return workflowRun.conclusion == null;
         }
     }
 }

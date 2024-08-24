@@ -8,6 +8,7 @@ namespace GitHubActionsDataCollector.GitHubActionsApi
     {
         Task<WorkflowRunListDto> GetWorkflowRuns(string repoOwner, string repoName, string token, long workflowId, DateTime fromDate, DateTime toDate, int pageNumber, int resultsPerPage);
         Task<WorkflowRunJobsListDto> GetJobsForWorkflowRun(string repoOwner, string repoName, string token, long workflowRunId, int pageNumber, int resultsPerPage);
+        Task<WorkflowRunArtifactsDto> GetArtifactsforWorkflowRun(string owner, string repo, string token, long workflowRunId);
     }
 
     public class GitHubActionsApiClient : IGitHubActionsApiClient
@@ -77,6 +78,22 @@ namespace GitHubActionsDataCollector.GitHubActionsApi
             }
 
             return JsonSerializer.Deserialize<WorkflowRunJobsListDto>(await response.Content.ReadAsStringAsync());
+        }
+
+        public async Task<WorkflowRunArtifactsDto> GetArtifactsforWorkflowRun(string owner, string repo, string token, long workflowRunId)
+        {
+            // TODO: implement paging. For now we assume that we will never need more than 100 artifacts
+            // [List artifacts for a workflow run](// [List jobs for a workflow run](https://docs.github.com/en/rest/actions/workflow-jobs?apiVersion=2022-11-28#list-jobs-for-a-workflow-run)
+            var url = $"{baseUrl}/repos/{owner}/{repo}/actions/runs/{workflowRunId}/artifacts?per_page=100&page=1";
+
+            var response = await _httpClient.SendAsync(BuildRequest(url, token));
+
+            if (response == null || !response.IsSuccessStatusCode)
+            {
+                throw new Exception($"Unable to retrieve workflow run artifacts for workflowRun:{workflowRunId}");
+            }
+
+            return JsonSerializer.Deserialize<WorkflowRunArtifactsDto>(await response.Content.ReadAsStringAsync());
         }
     }
 }

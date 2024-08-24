@@ -1,17 +1,20 @@
 ﻿using GitHubActionsDataCollector.GitHubActionsApi;
-using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.IO.Compression;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace GitHubActionsDataCollector.Processors.JobProcessors
 {
     public class DotNetXmlTestResultsProcessor : IJobProcessor
     {
-        public async Task Process(WorkflowRunJobDto job, WorkflowRunArtifactsDto artifacts)
+        private readonly IGitHubActionsApiClient _gitHubActionsApiClient;
+
+        public DotNetXmlTestResultsProcessor(IGitHubActionsApiClient gitHubActionsApiClient)
+        {
+            _gitHubActionsApiClient = gitHubActionsApiClient;
+        }
+
+        public async Task Process(string owner, string repo, string token, WorkflowRunJobDto job, WorkflowRunArtifactsDto artifacts)
         {
             var categoryName = GetCategoryName(job);
 
@@ -30,7 +33,25 @@ namespace GitHubActionsDataCollector.Processors.JobProcessors
                 return;
             }
 
-            // now we download the artifact
+            XDocument xdoc;
+
+            // now we download the artifact, unzip it and load it into XML doc
+            using (var artifactStream = await _gitHubActionsApiClient.GetWorkflowRunArtifact(owner, repo, token, artifact.id))
+            {
+                using (var archive = new ZipArchive(artifactStream, ZipArchiveMode.Read, true))
+                {
+                    var entry = archive.Entries.First();
+
+                    using (StreamReader sr = new StreamReader(entry.Open()))
+                    {
+                        xdoc = XDocument.Load(sr);
+                    }
+                }
+            }
+
+            XNamespace ns = "http://microsoft.com/schemas/VisualStudio/TeamTest/2010";
+
+            var results = xdoc.Descendants(ns + "UnitTestResult").ToList();
 
             // then we extract the file
 

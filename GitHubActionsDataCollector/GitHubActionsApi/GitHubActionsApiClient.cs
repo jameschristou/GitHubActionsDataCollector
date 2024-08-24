@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using GitHubActionsDataCollector.Entities;
+using System.Globalization;
 using System.Net.Http.Headers;
 using System.Text.Json;
 
@@ -8,7 +9,8 @@ namespace GitHubActionsDataCollector.GitHubActionsApi
     {
         Task<WorkflowRunListDto> GetWorkflowRuns(string repoOwner, string repoName, string token, long workflowId, DateTime fromDate, DateTime toDate, int pageNumber, int resultsPerPage);
         Task<WorkflowRunJobsListDto> GetJobsForWorkflowRun(string repoOwner, string repoName, string token, long workflowRunId, int pageNumber, int resultsPerPage);
-        Task<WorkflowRunArtifactsDto> GetArtifactsforWorkflowRun(string owner, string repo, string token, long workflowRunId);
+        Task<WorkflowRunArtifactsDto> GetArtifactsListforWorkflowRun(string owner, string repo, string token, long workflowRunId);
+        Task<Stream> GetWorkflowRunArtifact(string owner, string repo, string token, long artifactId);
     }
 
     public class GitHubActionsApiClient : IGitHubActionsApiClient
@@ -80,7 +82,7 @@ namespace GitHubActionsDataCollector.GitHubActionsApi
             return JsonSerializer.Deserialize<WorkflowRunJobsListDto>(await response.Content.ReadAsStringAsync());
         }
 
-        public async Task<WorkflowRunArtifactsDto> GetArtifactsforWorkflowRun(string owner, string repo, string token, long workflowRunId)
+        public async Task<WorkflowRunArtifactsDto> GetArtifactsListforWorkflowRun(string owner, string repo, string token, long workflowRunId)
         {
             // TODO: implement paging. For now we assume that we will never need more than 100 artifacts
             // [List artifacts for a workflow run](// [List jobs for a workflow run](https://docs.github.com/en/rest/actions/workflow-jobs?apiVersion=2022-11-28#list-jobs-for-a-workflow-run)
@@ -94,6 +96,26 @@ namespace GitHubActionsDataCollector.GitHubActionsApi
             }
 
             return JsonSerializer.Deserialize<WorkflowRunArtifactsDto>(await response.Content.ReadAsStringAsync());
+        }
+
+        public async Task<Stream> GetWorkflowRunArtifact(string owner, string repo, string token, long artifactId)
+        {
+            // [Get download URL for an artifact](// [Download an artifact](https://docs.github.com/en/rest/actions/artifacts?apiVersion=2022-11-28#download-an-artifact)
+            var url = $"{baseUrl}/repos/{owner}/{repo}/actions/artifacts/{artifactId}/zip";
+
+            var response = await _httpClient.SendAsync(BuildRequest(url, token));
+
+            if (response == null || response.StatusCode != System.Net.HttpStatusCode.OK)
+            {
+                throw new Exception($"Unable to retrieve workflow run artifact:{artifactId}");
+            }
+
+            return await response.Content.ReadAsStreamAsync();
+        }
+
+        private async Task DownloadArtifact(string owner, string repo, string token, string url)
+        {
+
         }
     }
 }

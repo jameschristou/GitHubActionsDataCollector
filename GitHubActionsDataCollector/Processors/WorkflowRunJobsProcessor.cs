@@ -27,7 +27,7 @@ namespace GitHubActionsDataCollector.Processors
         public async Task<List<WorkflowRunJob>> Process(string repoOwner, string repoName, string token, WorkflowRun workflowRun)
         {
             // we need to get the archive files for this run. they might be needed in job processing
-            var artifactFiles = await _gitHubActionsApiClient.GetArtifactsforWorkflowRun(repoOwner, repoName, token, workflowRun.RunId);
+            var artifactFiles = await _gitHubActionsApiClient.GetArtifactsListforWorkflowRun(repoOwner, repoName, token, workflowRun.RunId);
 
             var workflowJobs = new List<WorkflowRunJob>();
             var resultsPerPage = 40;
@@ -82,7 +82,7 @@ namespace GitHubActionsDataCollector.Processors
 
                     Console.WriteLine($"Found new job: {jobKey}");
 
-                    await _workflowRunJobProcessor.Process(job, artifactFiles);
+                    await _workflowRunJobProcessor.Process(repoOwner, repoName, token, job, artifactFiles);
                 }
             }
             while (pageNumber * resultsPerPage < totalResults);

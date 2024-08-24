@@ -5,7 +5,7 @@ namespace GitHubActionsDataCollector.Processors
 {
     public interface IWorkflowRunJobProcessor
     {
-        public Task Process(WorkflowRunJobDto job, WorkflowRunArtifactsDto artifacts);
+        public Task Process(string repoOwner, string repoName, string token, WorkflowRunJobDto job, WorkflowRunArtifactsDto artifacts);
     }
 
     public class WorkflowRunJobProcessor : IWorkflowRunJobProcessor
@@ -17,7 +17,7 @@ namespace GitHubActionsDataCollector.Processors
             _jobProcessor = jobProcessor;
         }
 
-        public async Task Process(WorkflowRunJobDto job, WorkflowRunArtifactsDto artifacts)
+        public async Task Process(string repoOwner, string repoName, string token, WorkflowRunJobDto job, WorkflowRunArtifactsDto artifacts)
         {
             Console.WriteLine($"Processing job:{job.id} in run:{job.run_id} attempt:{job.run_attempt}");
 
@@ -28,7 +28,7 @@ namespace GitHubActionsDataCollector.Processors
             // right now we only have one processor but if we end up with multiple then we might need a factory approach here
             if (_jobProcessor.CanProcessJob(job))
             {
-                await _jobProcessor.Process(job, artifacts);
+                await _jobProcessor.Process(repoOwner, repoName, token, job, artifacts);
             }
         }
     }

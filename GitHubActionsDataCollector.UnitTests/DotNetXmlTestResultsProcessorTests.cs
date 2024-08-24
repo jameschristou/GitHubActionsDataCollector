@@ -1,4 +1,5 @@
-﻿using GitHubActionsDataCollector.GitHubActionsApi;
+﻿using GitHubActionsDataCollector.Entities;
+using GitHubActionsDataCollector.GitHubActionsApi;
 using GitHubActionsDataCollector.Processors.JobProcessors;
 using NSubstitute;
 using System.IO.Compression;
@@ -15,9 +16,9 @@ namespace GitHubActionsDataCollector.UnitTests
 
             var processor = new DotNetXmlTestResultsProcessor(client);
 
-            Assert.True(processor.CanProcessJob(new GitHubActionsApi.WorkflowRunJobDto
+            Assert.True(processor.CanProcessJob(new WorkflowRunJob
             {
-                name = "Regression1 migrate and test / Run smoke and regression tests / Regression Test / API regression test (Regression_Category_A, --filter \"Category=A\", 7)"
+                Name = "Regression1 migrate and test / Run smoke and regression tests / Regression Test / API regression test (Regression_Category_A, --filter \"Category=A\", 7)"
             }));
         }
 
@@ -28,9 +29,9 @@ namespace GitHubActionsDataCollector.UnitTests
 
             var processor = new DotNetXmlTestResultsProcessor(client);
 
-            Assert.False(processor.CanProcessJob(new GitHubActionsApi.WorkflowRunJobDto
+            Assert.False(processor.CanProcessJob(new WorkflowRunJob
             {
-                name = "Regression1 migrate and test / Run smoke and regression tests / Smoke Test / Cypress Smoke Test (tests., 2)"
+                Name = "Regression1 migrate and test / Run smoke and regression tests / Smoke Test / Cypress Smoke Test (tests., 2)"
             }));
         }
 
@@ -43,9 +44,9 @@ namespace GitHubActionsDataCollector.UnitTests
 
             var processor = new DotNetXmlTestResultsProcessor(client);
 
-            var jobDto = new WorkflowRunJobDto
+            var job = new WorkflowRunJob
             {
-                name = "Regression1 migrate and test / Run smoke and regression tests / Regression Test / API regression test (Regression_Category_A, --filter \"Category=A\", 7)"
+                Name = "Regression1 migrate and test / Run smoke and regression tests / Regression Test / API regression test (Regression_Category_A, --filter \"Category=A\", 7)"
             };
 
             var artifactDto = new WorkflowRunArtifactsDto
@@ -60,7 +61,7 @@ namespace GitHubActionsDataCollector.UnitTests
                 }
             };
 
-            var result = processor.Process("", "", "", jobDto, artifactDto);
+            var result = processor.Process("", "", "", job, artifactDto);
         }
 
         private Stream GetZipArchiveStreamFromTestDoc()

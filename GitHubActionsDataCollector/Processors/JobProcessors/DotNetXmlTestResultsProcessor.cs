@@ -1,4 +1,5 @@
-﻿using GitHubActionsDataCollector.GitHubActionsApi;
+﻿using GitHubActionsDataCollector.Entities;
+using GitHubActionsDataCollector.GitHubActionsApi;
 using System.IO.Compression;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
@@ -14,13 +15,13 @@ namespace GitHubActionsDataCollector.Processors.JobProcessors
             _gitHubActionsApiClient = gitHubActionsApiClient;
         }
 
-        public async Task Process(string owner, string repo, string token, WorkflowRunJobDto job, WorkflowRunArtifactsDto artifacts)
+        public async Task Process(string owner, string repo, string token, WorkflowRunJob job, WorkflowRunArtifactsDto artifacts)
         {
             var categoryName = GetCategoryName(job);
 
             if(string.IsNullOrEmpty(categoryName))
             {
-                Console.WriteLine($"Could not get category name for job:{job.name}");
+                Console.WriteLine($"Could not get category name for job:{job.Name}");
                 return;
             }
 
@@ -29,7 +30,7 @@ namespace GitHubActionsDataCollector.Processors.JobProcessors
 
             if(artifact == null)
             {
-                Console.WriteLine($"Could not get artifact name for job:{job.name}");
+                Console.WriteLine($"Could not get artifact name for job:{job.Name}");
                 return;
             }
 
@@ -51,31 +52,31 @@ namespace GitHubActionsDataCollector.Processors.JobProcessors
 
             XNamespace ns = "http://microsoft.com/schemas/VisualStudio/TeamTest/2010";
 
-            var results = xdoc.Descendants(ns + "UnitTestResult").ToList();
+            var results = xdoc.Descendants(ns + "UnitTestResult")
+                                .Where(el => el.Attribute("outcome").Value.Equals("Passed") || el.Attribute("outcome").Value.Equals("Failed"))
+                                .Select(x => new TestResult
+                                {
+                                    Name = x.Attribute("testName").Value,
+                                    Result = x.Attribute("outcome").Value,
+                                    DurationMs = (int)TimeSpan.Parse(x.Attribute("duration").Value).TotalMilliseconds
+                                }).ToList();
 
-            // then we extract the file
-
-            // load it as an XML document
-
-            // extract all the test results
-
-            // process each result one by one
-
-            // need a way to save the test results
+            // add the tests to the job entity
+            job.TestResults = results;
 
             return;
         }
 
-        public bool CanProcessJob(WorkflowRunJobDto job)
+        public bool CanProcessJob(WorkflowRunJob job)
         {
             return !string.IsNullOrEmpty(GetCategoryName(job));
         }
 
-        private string GetCategoryName(WorkflowRunJobDto job)
+        private string GetCategoryName(WorkflowRunJob job)
         {
             // we get this through the job name
             var regEx = new Regex(@"API regression test \(([^,]*),");
-            var matches = regEx.Matches(job.name);
+            var matches = regEx.Matches(job.Name);
             if (matches.Any())
             {
                 return matches[0].Groups[1].Value;

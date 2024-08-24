@@ -61,28 +61,26 @@ namespace GitHubActionsDataCollector.Processors
                     // don't add again if we've seen this job before
                     if (jobIndex.ContainsKey(jobKey)) continue;
 
-                    workflowJobs.Add(
-                        new WorkflowRunJob
-                        {
-                            RunId = job.run_id,
-                            JobId = job.id,
-                            RunAttempt = job.run_attempt,
-                            Name = job.name,
-                            Conclusion = job.conclusion,
-                            Url = job.html_url,
-                            StartedAtUtc = DateTime.Parse(job.started_at, null, System.Globalization.DateTimeStyles.RoundtripKind),
-                            CompletedAtUtc = DateTime.Parse(job.completed_at, null, System.Globalization.DateTimeStyles.RoundtripKind),
-                            WorkflowRun = workflowRun
-                        }
-                    );
+                    var workflowRunJob = new WorkflowRunJob
+                    {
+                        RunId = job.run_id,
+                        JobId = job.id,
+                        RunAttempt = job.run_attempt,
+                        Name = job.name,
+                        Conclusion = job.conclusion,
+                        Url = job.html_url,
+                        StartedAtUtc = DateTime.Parse(job.started_at, null, System.Globalization.DateTimeStyles.RoundtripKind),
+                        CompletedAtUtc = DateTime.Parse(job.completed_at, null, System.Globalization.DateTimeStyles.RoundtripKind),
+                        WorkflowRun = workflowRun
+                    };
 
                     jobIndex.Add(jobKey, job.id);
 
-                    // if this job has tests then process them from the logs and set them
-
                     Console.WriteLine($"Found new job: {jobKey}");
 
-                    await _workflowRunJobProcessor.Process(repoOwner, repoName, token, job, artifactFiles);
+                    await _workflowRunJobProcessor.Process(repoOwner, repoName, token, workflowRunJob, artifactFiles);
+
+                    workflowJobs.Add(workflowRunJob);
                 }
             }
             while (pageNumber * resultsPerPage < totalResults);

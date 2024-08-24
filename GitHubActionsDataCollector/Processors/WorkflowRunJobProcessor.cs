@@ -1,11 +1,12 @@
-﻿using GitHubActionsDataCollector.GitHubActionsApi;
+﻿using GitHubActionsDataCollector.Entities;
+using GitHubActionsDataCollector.GitHubActionsApi;
 using GitHubActionsDataCollector.Processors.JobProcessors;
 
 namespace GitHubActionsDataCollector.Processors
 {
     public interface IWorkflowRunJobProcessor
     {
-        public Task Process(string repoOwner, string repoName, string token, WorkflowRunJobDto job, WorkflowRunArtifactsDto artifacts);
+        public Task Process(string repoOwner, string repoName, string token, WorkflowRunJob job, WorkflowRunArtifactsDto artifacts);
     }
 
     public class WorkflowRunJobProcessor : IWorkflowRunJobProcessor
@@ -17,9 +18,9 @@ namespace GitHubActionsDataCollector.Processors
             _jobProcessor = jobProcessor;
         }
 
-        public async Task Process(string repoOwner, string repoName, string token, WorkflowRunJobDto job, WorkflowRunArtifactsDto artifacts)
+        public async Task Process(string repoOwner, string repoName, string token, WorkflowRunJob job, WorkflowRunArtifactsDto artifacts)
         {
-            Console.WriteLine($"Processing job:{job.id} in run:{job.run_id} attempt:{job.run_attempt}");
+            Console.WriteLine($"Processing job:{job.JobId} in run:{job.RunId} attempt:{job.RunAttempt}");
 
             // check if this job is registered for any special processing. This will be configuration based per workflow. There will be a set number of built in special processors
             // but you can also implement your own custom processor

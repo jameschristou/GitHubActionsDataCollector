@@ -8,7 +8,7 @@ namespace GitHubActionsDataCollector.Mappings
         public TestResultMap() 
         {
             Id(x => x.Id);
-            Map(x => x.Name);
+            Map(x => x.Name).Length(600);
             Map(x => x.Result);
             Map(x => x.DurationMs);
             References(x => x.WorkflowRunJob, "WorkflowRunJobId");

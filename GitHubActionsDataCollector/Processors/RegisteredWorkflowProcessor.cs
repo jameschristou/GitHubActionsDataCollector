@@ -14,8 +14,7 @@ namespace GitHubActionsDataCollector.Processors
         private readonly IWorkflowRunProcessor _workflowRunProcessor;
         private readonly IGitHubActionsApiClient _gitHibActionsApiClient;
         private readonly IRegisteredWorkflowRepository _registeredWorkflowRepository;
-        private const int MaxBatchSize = 4;
-        private const int ResultsPerPage = 10;
+        private const int ResultsPerPage = 20;
         private const int SearchWindowInHours = 24;
 
         public RegisteredWorkflowProcessor(IWorkflowRunProcessor workflowRunProcessor, 
@@ -62,7 +61,7 @@ namespace GitHubActionsDataCollector.Processors
                     }
                 }
             }
-            while (pageNumber < MaxBatchSize && pageNumber * ResultsPerPage < totalResults);
+            while (pageNumber * ResultsPerPage < totalResults);
 
             // now we need to update the ProcessedUntilUtc
             registeredWorkflow.ProcessedUntilUtc = processedUntilDate;

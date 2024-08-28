@@ -25,8 +25,10 @@ namespace GitHubActionsDataCollector.Processors.JobProcessors
                 return;
             }
 
-            // first we need to get the artifact file for this job
-            var artifact = artifacts.artifacts.FirstOrDefault(a => a.name.Contains(categoryName, StringComparison.OrdinalIgnoreCase));
+            // first we need to get the artifact file for this job. Match of the test category, the run attempt and the environment
+            var artifact = artifacts.artifacts.FirstOrDefault(a => a.name.Contains(categoryName, StringComparison.OrdinalIgnoreCase) &&
+                                                                    a.name.Contains($"Attempt-{job.RunAttempt}", StringComparison.OrdinalIgnoreCase) &&
+                                                                    a.name.Contains(GetEnvironmentName(job), StringComparison.OrdinalIgnoreCase));
 
             if(artifact == null)
             {
@@ -58,7 +60,8 @@ namespace GitHubActionsDataCollector.Processors.JobProcessors
                                 {
                                     Name = x.Attribute("testName").Value,
                                     Result = x.Attribute("outcome").Value,
-                                    DurationMs = (int)TimeSpan.Parse(x.Attribute("duration").Value).TotalMilliseconds
+                                    DurationMs = (int)TimeSpan.Parse(x.Attribute("duration").Value).TotalMilliseconds,
+                                    WorkflowRunJob = job
                                 }).ToList();
 
             // add the tests to the job entity
@@ -83,6 +86,11 @@ namespace GitHubActionsDataCollector.Processors.JobProcessors
             }
 
             return string.Empty;
+        }
+
+        private string GetEnvironmentName(WorkflowRunJob job)
+        {
+            return job.Name.Split('/').FirstOrDefault()?.Trim();
         }
     }
 }

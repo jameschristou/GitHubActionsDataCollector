@@ -35,15 +35,21 @@ We start interrogating the workflow run logs to get details on test results. We 
 * Add the ability to record individual test results (status, duration, error messages, etc) - may need some config to determine which steps are tests (by name)
 * Extract and record test results for XUnit tests
 * Extract and record test results for Cypress tests
+* 
 
-## Phase 7
+## Phase 7 - Reporting & Dashboards
+* Create some basic SQL scripts to get reports (DONE)
+* Export data to somewhere like Google Sheet
+* Create dashboard view from data
+
+## Phase 8
 Introduce job groups for grouping related jobs. Job groups should also have duration and conclusion info
 * Introduce job groups - grouping could be configured through regex on job name
 * Each run has job groups and each job belongs to a job group (is this true in simple workflows??)
 
-## Phase 8
+## Phase 9
 Look at defending against exceeding Github API limits
 * Because of (GHA API usage limits)[https://docs.github.com/en/actions/administering-github-actions/usage-limits-billing-and-administration] we want to make sure we limit how many calls are made in an hour. The X-RateLimit-Remaining response header could be useful.
 
-## Phase 9
+## Phase 10
 Set this up to run as a container in AWS Lambda on a regular schedule

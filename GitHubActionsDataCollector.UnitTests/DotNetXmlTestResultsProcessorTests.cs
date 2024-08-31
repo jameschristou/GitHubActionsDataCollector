@@ -12,11 +12,7 @@ namespace GitHubActionsDataCollector.UnitTests
         [Fact]
         public void CanProcessJob_ReturnsTrue_ForApiRegressionTestJob()
         {
-            var client = NSubstitute.Substitute.For<IGitHubActionsApiClient>();
-
-            var processor = new DotNetXmlTestResultsProcessor(client);
-
-            Assert.True(processor.CanProcessJob(new WorkflowRunJob
+            Assert.True(DotNetXmlTestResultsProcessor.CanProcessJob(new WorkflowRunJob
             {
                 Name = "Regression1 migrate and test / Run smoke and regression tests / Regression Test / API regression test (Regression_Category_A, --filter \"Category=A\", 7)"
             }));
@@ -25,11 +21,7 @@ namespace GitHubActionsDataCollector.UnitTests
         [Fact]
         public void CanProcessJob_ReturnsFalse_ForNonApiRegressionTestJob()
         {
-            var client = NSubstitute.Substitute.For<IGitHubActionsApiClient>();
-
-            var processor = new DotNetXmlTestResultsProcessor(client);
-
-            Assert.False(processor.CanProcessJob(new WorkflowRunJob
+            Assert.False(DotNetXmlTestResultsProcessor.CanProcessJob(new WorkflowRunJob
             {
                 Name = "Regression1 migrate and test / Run smoke and regression tests / Smoke Test / Cypress Smoke Test (tests., 2)"
             }));

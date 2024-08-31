@@ -70,12 +70,12 @@ namespace GitHubActionsDataCollector.Processors.JobProcessors
             return;
         }
 
-        public bool CanProcessJob(WorkflowRunJob job)
+        public static bool CanProcessJob(WorkflowRunJob job)
         {
             return !string.IsNullOrEmpty(GetCategoryName(job));
         }
 
-        private string GetCategoryName(WorkflowRunJob job)
+        private static string GetCategoryName(WorkflowRunJob job)
         {
             // we get this through the job name
             var regEx = new Regex(@"API regression test \(([^,]*),");

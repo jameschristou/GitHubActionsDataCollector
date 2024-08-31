@@ -38,7 +38,8 @@ IHostBuilder CreateHostBuilder(string[] strings)
             services.AddTransient<IWorkflowRunProcessor, WorkflowRunProcessor>();
             services.AddTransient<IWorkflowRunJobsProcessor, WorkflowRunJobsProcessor>();
             services.AddTransient<IWorkflowRunJobProcessor, WorkflowRunJobProcessor>();
-            services.AddTransient<IJobProcessor, DotNetXmlTestResultsProcessor>();
+            services.AddTransient<DotNetXmlTestResultsProcessor>();
+            services.AddTransient<JobProcessorFactory>();
             services.AddTransient<IWorkflowRunRepository, WorkflowRunRepository>();
             services.AddTransient<IWorkflowRunJobsRepository, WorkflowRunJobsRepository>();
             services.AddTransient<IRegisteredWorkflowRepository, RegisteredWorkflowRepository>();

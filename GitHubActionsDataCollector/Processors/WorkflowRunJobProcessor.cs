@@ -11,11 +11,11 @@ namespace GitHubActionsDataCollector.Processors
 
     public class WorkflowRunJobProcessor : IWorkflowRunJobProcessor
     {
-        private readonly IJobProcessor _jobProcessor;
+        private readonly JobProcessorFactory _jobProcessorFactory;
 
-        public WorkflowRunJobProcessor(IJobProcessor jobProcessor)
+        public WorkflowRunJobProcessor(JobProcessorFactory jobProcessorFactory)
         {
-            _jobProcessor = jobProcessor;
+            _jobProcessorFactory = jobProcessorFactory;
         }
 
         public async Task Process(string repoOwner, string repoName, string token, WorkflowRunJob job, WorkflowRunArtifactsDto artifacts)
@@ -26,10 +26,11 @@ namespace GitHubActionsDataCollector.Processors
             // but you can also implement your own custom processor
             // first thing to do is check which JobProcessors need to be run for this job
 
-            // right now we only have one processor but if we end up with multiple then we might need a factory approach here
-            if (_jobProcessor.CanProcessJob(job))
+            var jobProcessor = _jobProcessorFactory.Create(job);
+
+            if (jobProcessor != null)
             {
-                await _jobProcessor.Process(repoOwner, repoName, token, job, artifacts);
+                await jobProcessor.Process(repoOwner, repoName, token, job, artifacts);
             }
         }
     }

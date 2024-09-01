@@ -19,6 +19,11 @@ namespace GitHubActionsDataCollector.Processors.JobProcessors
                 return GetService<DotNetXmlTestResultsProcessor>();
             }
 
+            if (CypressTestResultsProcessor.CanProcessJob(job))
+            {
+                return GetService<CypressTestResultsProcessor>();
+            }
+
             return null;
         }
 

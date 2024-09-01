@@ -30,7 +30,7 @@ namespace GitHubActionsDataCollector.UnitTests
         [Fact]
         public void CanProcessTestResultsXml()
         {
-            var client = NSubstitute.Substitute.For<IGitHubActionsApiClient>();
+            var client = Substitute.For<IGitHubActionsApiClient>();
 
             client.GetWorkflowRunArtifact(default, default, default, default).ReturnsForAnyArgs(s => GetZipArchiveStreamFromTestDoc());
 

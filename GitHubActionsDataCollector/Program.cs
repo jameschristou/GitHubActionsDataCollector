@@ -11,6 +11,7 @@ using NHibernate.Cfg;
 using GitHubActionsDataCollector.Processors;
 using GitHubActionsDataCollector;
 using GitHubActionsDataCollector.Processors.JobProcessors;
+using GitHubActionsDataCollector.Services;
 
 using IHost host = CreateHostBuilder(args).Build();
 using var scope = host.Services.CreateScope();
@@ -38,7 +39,9 @@ IHostBuilder CreateHostBuilder(string[] strings)
             services.AddTransient<IWorkflowRunProcessor, WorkflowRunProcessor>();
             services.AddTransient<IWorkflowRunJobsProcessor, WorkflowRunJobsProcessor>();
             services.AddTransient<IWorkflowRunJobProcessor, WorkflowRunJobProcessor>();
+            services.AddTransient<IWorkflowRunLogsService, WorkflowRunLogsService>();
             services.AddTransient<DotNetXmlTestResultsProcessor>();
+            services.AddTransient<CypressTestResultsProcessor>();
             services.AddTransient<JobProcessorFactory>();
             services.AddTransient<IWorkflowRunRepository, WorkflowRunRepository>();
             services.AddTransient<IWorkflowRunJobsRepository, WorkflowRunJobsRepository>();

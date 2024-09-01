@@ -1,6 +1,9 @@
 ﻿using GitHubActionsDataCollector.GitHubActionsApi;
 using GitHubActionsDataCollector.Entities;
 using GitHubActionsDataCollector.Repositories;
+using System.IO.Compression;
+using System.Xml.Linq;
+using GitHubActionsDataCollector.Services;
 
 namespace GitHubActionsDataCollector.Processors
 {
@@ -12,15 +15,12 @@ namespace GitHubActionsDataCollector.Processors
     internal class WorkflowRunJobsProcessor : IWorkflowRunJobsProcessor
     {
         private readonly IGitHubActionsApiClient _gitHubActionsApiClient;
-        private readonly IWorkflowRunJobsRepository _workflowRunJobsRepository;
         private readonly IWorkflowRunJobProcessor _workflowRunJobProcessor;
 
         public WorkflowRunJobsProcessor(IGitHubActionsApiClient gitHubActionsApiClient,
-                                        IWorkflowRunJobsRepository workflowRunJobsRepository,
                                         IWorkflowRunJobProcessor workflowRunJobProcessor)
         {
             _gitHubActionsApiClient = gitHubActionsApiClient;
-            _workflowRunJobsRepository = workflowRunJobsRepository;
             _workflowRunJobProcessor = workflowRunJobProcessor;
         }
 

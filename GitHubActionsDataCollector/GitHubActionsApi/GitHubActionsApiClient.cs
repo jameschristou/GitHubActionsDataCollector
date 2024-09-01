@@ -1,5 +1,4 @@
-﻿using GitHubActionsDataCollector.Entities;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Net.Http.Headers;
 using System.Text.Json;
 
@@ -11,6 +10,7 @@ namespace GitHubActionsDataCollector.GitHubActionsApi
         Task<WorkflowRunJobsListDto> GetJobsForWorkflowRun(string repoOwner, string repoName, string token, long workflowRunId, int pageNumber, int resultsPerPage);
         Task<WorkflowRunArtifactsDto> GetArtifactsListforWorkflowRun(string owner, string repo, string token, long workflowRunId);
         Task<Stream> GetWorkflowRunArtifact(string owner, string repo, string token, long artifactId);
+        Task<Stream> GetWorkflowRunAttemptLogs(string owner, string repo, string token, long workflowRunId, int attemptNumber);
     }
 
     public class GitHubActionsApiClient : IGitHubActionsApiClient
@@ -113,9 +113,19 @@ namespace GitHubActionsDataCollector.GitHubActionsApi
             return await response.Content.ReadAsStreamAsync();
         }
 
-        private async Task DownloadArtifact(string owner, string repo, string token, string url)
+        public async Task<Stream> GetWorkflowRunAttemptLogs(string owner, string repo, string token, long workflowRunId, int attemptNumber)
         {
+            // [Download run attempt logs](https://docs.github.com/en/rest/actions/workflow-runs?apiVersion=2022-11-28#download-workflow-run-attempt-logs)
+            var url = $"{baseUrl}/repos/{owner}/{repo}/actions/runs/{workflowRunId}/attempts/{attemptNumber}/logs";
 
+            var response = await _httpClient.SendAsync(BuildRequest(url, token));
+
+            if (response == null || response.StatusCode != System.Net.HttpStatusCode.OK)
+            {
+                throw new Exception($"Unable to retrieve workflow run attempt logs:{workflowRunId} attemptNumber:{attemptNumber}");
+            }
+
+            return await response.Content.ReadAsStreamAsync();
         }
     }
 }

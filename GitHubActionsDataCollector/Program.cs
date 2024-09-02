@@ -39,7 +39,7 @@ IHostBuilder CreateHostBuilder(string[] strings)
             services.AddTransient<IWorkflowRunProcessor, WorkflowRunProcessor>();
             services.AddTransient<IWorkflowRunJobsProcessor, WorkflowRunJobsProcessor>();
             services.AddTransient<IWorkflowRunJobProcessor, WorkflowRunJobProcessor>();
-            services.AddTransient<IWorkflowRunLogsService, WorkflowRunLogsService>();
+            services.AddSingleton<IWorkflowRunLogsService, WorkflowRunLogsService>();  // TODO: for now register as singleton but need to improve this for memory management
             services.AddTransient<DotNetXmlTestResultsProcessor>();
             services.AddTransient<CypressTestResultsProcessor>();
             services.AddTransient<JobProcessorFactory>();

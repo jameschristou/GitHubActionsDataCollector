@@ -90,7 +90,7 @@ namespace GitHubActionsDataCollector.Processors.JobProcessors
 
         private string GetEnvironmentName(WorkflowRunJob job)
         {
-            return job.Name.Split('/').FirstOrDefault()?.Trim();
+            return job.Name.Split(' ').FirstOrDefault()?.Trim();
         }
     }
 }

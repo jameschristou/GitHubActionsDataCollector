@@ -8,7 +8,7 @@ namespace GitHubActionsDataCollector.Services
 {
     public interface IWorkflowRunLogsService
     {
-        Task<string> GetRunAttemptLogForJob(string owner, string repo, string token, WorkflowRunJob job);
+        Task<ZipArchiveEntry> GetRunAttemptLogForJob(string owner, string repo, string token, WorkflowRunJob job);
     }
 
     public class WorkflowRunLogsService : IWorkflowRunLogsService
@@ -21,26 +21,36 @@ namespace GitHubActionsDataCollector.Services
             _gitHubActionsApiClient = gitHubActionsApiClient;
         }
 
-        public async Task<string> GetRunAttemptLogForJob(string owner, string repo, string token, WorkflowRunJob job)
+        public async Task<ZipArchiveEntry> GetRunAttemptLogForJob(string owner, string repo, string token, WorkflowRunJob job)
         {
             var archive = await GetRunAttemptLogArtifact(owner, repo, token, job.RunId, job.RunAttempt);
             // full name contains the job details (folder name)
             // name needs to contain _Run Cypress.txt
-            var entry = archive.Entries.FirstOrDefault(e => e.FullName.StartsWith(GetArchiveEntryPrefix(job), StringComparison.InvariantCultureIgnoreCase) 
-                                                        && e.Name.EndsWith(GetArchiveEntrySuffix(job), StringComparison.InvariantCultureIgnoreCase));
+            var archiveEntryPrefix = GetArchiveEntryPrefix(job);
+            var archiveEntrySuffix = GetArchiveEntrySuffix(job);
 
-            if (entry == null)
+            // NOTE: the archive entry names are truncated by GHA if too long so it may not be possible to find them
+
+            var archiveEntries = archive.Entries.Where(e => e.FullName.StartsWith(archiveEntryPrefix, StringComparison.InvariantCultureIgnoreCase) 
+                                                        && e.Name.Contains(archiveEntrySuffix, StringComparison.InvariantCultureIgnoreCase));
+
+            if(archiveEntries == null || archiveEntries.Count() == 0)
             {
-                Console.WriteLine($"Could not find archive entry for job: {job.Id}");
-                return string.Empty;
+                //Regression1 migrate and test  Run smoke and regression tests Smoke Test Cypress Smoke Te(2)/ 4_Checkout.txt
+                //Regression1 migrate and test / Run smoke and regression tests / Smoke Test / Cypress Smoke Test (en-AU, au-tests., 2)
+
+                //Regression1 migrate and test  Run smoke and regression tests  Smoke Test  Cypress Smoke Te (1)/17_Post Checkout.txt
+                Console.WriteLine($"Archive entry not found for job:{job.Id} name:{job.Name}");
+                return null;
             }
 
-            using (var sr = new StreamReader(entry.Open()))
+            if(archiveEntries.Count() > 1)
             {
-                var text = await sr.ReadToEndAsync();
-
-                return RemoveAnsiEscapeCodes(text);
+                Console.WriteLine($"Multiple archive entries found for job:{job.Id} name:{job.Name}");
+                return null;
             }
+
+            return archiveEntries.First();
         }
 
         private async Task<ZipArchive> GetRunAttemptLogArtifact(string owner, string repo, string token, long workflowRunId, int attemptNumber)
@@ -69,7 +79,7 @@ namespace GitHubActionsDataCollector.Services
         {
             if(job.Name.Contains("cypress", StringComparison.InvariantCultureIgnoreCase))
             {
-                return "_Run Cypress.txt";
+                return "_Run Cypress";
             }
 
             return string.Empty;

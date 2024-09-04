@@ -65,6 +65,7 @@ namespace GitHubActionsDataCollector.Processors
             {
                 workflowRun.CompletedAtUtc = GetWorkflowRunCompletionTime(jobs);
                 workflowRun.ProcessedAtUtc = DateTime.UtcNow;
+                workflowRun.Conclusion = GetConclusion(workflowRun);
 
                 await _workflowRunRepository.SaveWorkflowRun(workflowRun);
             }
@@ -99,6 +100,20 @@ namespace GitHubActionsDataCollector.Processors
             // the github actions api doesn't give us a date that the workflow finished running
             // we get this by getting the completion time of the last job to complete or fail
             return workflowRunJobs.OrderBy(x => x.CompletedAtUtc).Last().CompletedAtUtc;
+        }
+
+        private string GetConclusion(WorkflowRun workflowRun)
+        {
+            if(string.Equals("success", workflowRun.Conclusion, StringComparison.OrdinalIgnoreCase)) return workflowRun.Conclusion;
+
+            // TODO: make this configurable (the job will differ by each workflow)
+            // If this job is successfully completed then we can mark the run as successful
+            if(workflowRun.Jobs != null && workflowRun.Jobs.Any(j => string.Equals("Prod / Post Deploy Tasks", j.Name, StringComparison.OrdinalIgnoreCase) && j.Conclusion == "success"))
+            {
+                return "success";
+            }
+
+            return workflowRun.Conclusion;
         }
     }
 }

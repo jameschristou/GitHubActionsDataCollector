@@ -152,15 +152,30 @@ namespace GitHubActionsDataCollector.Processors.JobProcessors
                 }
             }
 
-            var durationParts = testDuration.Split(':').Select(x => int.Parse(x)).ToList();
-            var result = testsFailed == "-" ? "Passed" : "Failed";
-
             return new TestResult()
             {
                 Name = testName,
-                DurationMs = durationParts[0] * 60 * 1000 + durationParts[1] * 1000,
-                Result = result
+                DurationMs = GetDurationInMs(testDuration),
+                Result = testsFailed == "-" ? "Passed" : "Failed"
             };
+        }
+
+        private int GetDurationInMs(string durationString)
+        {
+            var duration = 0;
+
+            if (durationString.Contains(':'))
+            {
+                var durationParts = durationString.Split(':').Select(x => int.Parse(x)).ToList();
+                duration = durationParts[0] * 60 * 1000 + durationParts[1] * 1000;
+            }
+
+            if (durationString.EndsWith("ms"))
+            {
+                duration = int.Parse(durationString.Substring(0, durationString.Length - 3));
+            }
+
+            return duration;
         }
 
         public static bool CanProcessJob(WorkflowRunJob job)

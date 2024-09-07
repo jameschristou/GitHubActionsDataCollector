@@ -12,7 +12,8 @@ namespace GitHubActionsDataCollector.Mappings
             Map(x => x.Repo);
             Map(x => x.WorkflowId);
             Map(x => x.WorkflowName);
-            Map(x => x.Token);
+            Map(x => x.IsActive);
+            Map(x => x.Settings).Length(int.MaxValue);
             Map(x => x.LastCheckedAtUtc);
             Map(x => x.ProcessedUntilUtc);
         }

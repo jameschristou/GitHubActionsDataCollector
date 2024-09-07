@@ -57,7 +57,7 @@ namespace GitHubActionsDataCollector.Processors
                 NumAttempts = workflowRunDto.run_attempt
             };
 
-            var jobs = await _workflowRunJobsProcessor.Process(registeredWorkflow.Owner, registeredWorkflow.Repo, registeredWorkflow.Token, workflowRun);
+            var jobs = await _workflowRunJobsProcessor.Process(registeredWorkflow.Owner, registeredWorkflow.Repo, registeredWorkflow.GetSettings().Token, workflowRun);
 
             workflowRun.Jobs = jobs;
 

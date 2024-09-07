@@ -40,7 +40,7 @@ namespace GitHubActionsDataCollector.Processors
             {
                 pageNumber++;
 
-                var workflowRuns = await _gitHibActionsApiClient.GetWorkflowRuns(registeredWorkflow.Owner, registeredWorkflow.Repo, registeredWorkflow.Token, registeredWorkflow.WorkflowId, fromDate, toDate, pageNumber, ResultsPerPage);
+                var workflowRuns = await _gitHibActionsApiClient.GetWorkflowRuns(registeredWorkflow.Owner, registeredWorkflow.Repo, registeredWorkflow.GetSettings().Token, registeredWorkflow.WorkflowId, fromDate, toDate, pageNumber, ResultsPerPage);
                 totalResults = workflowRuns.total_count;
 
                 // for some reason, the results from the API are always sorted in DESC created order. We want ASC so that we always process oldest first

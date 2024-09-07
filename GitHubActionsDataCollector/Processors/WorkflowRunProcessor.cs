@@ -13,19 +13,16 @@ namespace GitHubActionsDataCollector.Processors
      * Gets data for a workflow run and processes it:
      * Initially just write the data we're interested in to the console to ensure we're processing it correctly
      */
-    internal class WorkflowRunProcessor : IWorkflowRunProcessor
+    public class WorkflowRunProcessor : IWorkflowRunProcessor
     {
         private readonly IWorkflowRunJobsProcessor _workflowRunJobsProcessor;
         private readonly IWorkflowRunRepository _workflowRunRepository;
-        private readonly IGitHubActionsApiClient _gitHubActionsApiClient;
 
         public WorkflowRunProcessor(IWorkflowRunJobsProcessor workflowRunJobsProcessor,
-                                    IWorkflowRunRepository workflowRunRepository,
-                                    IGitHubActionsApiClient gitHubActionsApiClient)
+                                    IWorkflowRunRepository workflowRunRepository)
         {
             _workflowRunJobsProcessor = workflowRunJobsProcessor;
             _workflowRunRepository = workflowRunRepository;
-            _gitHubActionsApiClient = gitHubActionsApiClient;
         }
 
         public async Task Process(RegisteredWorkflow registeredWorkflow, WorkflowRunDto workflowRunDto)
@@ -65,7 +62,7 @@ namespace GitHubActionsDataCollector.Processors
             {
                 workflowRun.CompletedAtUtc = GetWorkflowRunCompletionTime(jobs);
                 workflowRun.ProcessedAtUtc = DateTime.UtcNow;
-                workflowRun.Conclusion = GetConclusion(workflowRun);
+                workflowRun.Conclusion = GetConclusion(registeredWorkflow, workflowRun);
 
                 await _workflowRunRepository.SaveWorkflowRun(workflowRun);
             }
@@ -102,14 +99,17 @@ namespace GitHubActionsDataCollector.Processors
             return workflowRunJobs.OrderBy(x => x.CompletedAtUtc).Last().CompletedAtUtc;
         }
 
-        private string GetConclusion(WorkflowRun workflowRun)
+        private string GetConclusion(RegisteredWorkflow registeredWorkflow, WorkflowRun workflowRun)
         {
             if(string.Equals("success", workflowRun.Conclusion, StringComparison.OrdinalIgnoreCase)) return workflowRun.Conclusion;
 
-            // TODO: make this configurable (the job will differ by each workflow)
-            // If this job is successfully completed then we can mark the run as successful
-            if(workflowRun.Jobs != null && workflowRun.Jobs.Any(j => string.Equals("Prod / Post Deploy Tasks", j.Name, StringComparison.OrdinalIgnoreCase) && j.Conclusion == "success"))
+            var jobNameRequiredForSuccess = registeredWorkflow.GetSettings().JobNameRequiredForRunSuccess;
+
+            if (!string.IsNullOrEmpty(jobNameRequiredForSuccess)
+                && workflowRun.Jobs != null 
+                && workflowRun.Jobs.Any(j => string.Equals(jobNameRequiredForSuccess, j.Name, StringComparison.OrdinalIgnoreCase) && j.Conclusion == "success"))
             {
+                // If this job is successfully completed then we can mark the run as successful
                 return "success";
             }
 

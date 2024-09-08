@@ -6,7 +6,7 @@ namespace GitHubActionsDataCollector.Processors
 {
     public interface IWorkflowRunJobProcessor
     {
-        public Task Process(string repoOwner, string repoName, string token, WorkflowRunJob job, WorkflowRunArtifactsDto artifacts);
+        public Task Process(string repoOwner, string repoName, string token, WorkflowRunJob job, WorkflowRunArtifactsDto artifacts, WorkflowRunSettings runSettings);
     }
 
     public class WorkflowRunJobProcessor : IWorkflowRunJobProcessor
@@ -18,7 +18,7 @@ namespace GitHubActionsDataCollector.Processors
             _jobProcessorFactory = jobProcessorFactory;
         }
 
-        public async Task Process(string repoOwner, string repoName, string token, WorkflowRunJob job, WorkflowRunArtifactsDto artifacts)
+        public async Task Process(string repoOwner, string repoName, string token, WorkflowRunJob job, WorkflowRunArtifactsDto artifacts, WorkflowRunSettings runSettings)
         {
             Console.WriteLine($"Processing job:{job.JobId} in run:{job.RunId} attempt:{job.RunAttempt}");
 
@@ -26,7 +26,7 @@ namespace GitHubActionsDataCollector.Processors
             // but you can also implement your own custom processor
             // first thing to do is check which JobProcessors need to be run for this job
 
-            var jobProcessor = _jobProcessorFactory.Create(job);
+            var jobProcessor = _jobProcessorFactory.Create(job, runSettings);
 
             if (jobProcessor != null)
             {

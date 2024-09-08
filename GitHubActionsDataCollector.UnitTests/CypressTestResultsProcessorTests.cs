@@ -75,9 +75,9 @@ namespace GitHubActionsDataCollector.UnitTests
             Assert.Equal(420, job.TestResults[1].DurationMs);
 
             // failed test
-            Assert.Equal("Test7_spec.js", job.TestResults[6].Name);
-            Assert.Equal("Failed", job.TestResults[6].Result);
-            Assert.Equal(38000, job.TestResults[6].DurationMs);
+            Assert.Equal("Group1/Test12_spec.js", job.TestResults[11].Name);
+            Assert.Equal("Failed", job.TestResults[11].Result);
+            Assert.Equal(25000, job.TestResults[11].DurationMs);
         }
 
         private async Task<ZipArchiveEntry> GetCypressTestLogWithFailedTests()

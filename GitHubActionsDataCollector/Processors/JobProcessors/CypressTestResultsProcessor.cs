@@ -113,7 +113,7 @@ namespace GitHubActionsDataCollector.Processors.JobProcessors
 
         private async Task<TestResult> ProcessSpecSummary(string currentLine, StreamReader sr)
         {
-            var regEx = new Regex(@"^(.*?)[│] ([✔|✖])  (.\S*)(\s*)([:\d]*)(\s*)([\-:\d]*)(\s*)([\-:\d]*)(\s*)([\-:\d]*)");
+            var regEx = new Regex(@"^(.*?)[│] ([✔|✖])  (.\S*)(\s*)([:\d]*)(ms)?(\s*)([\-:\d]*)(\s*)([\-:\d]*)(\s*)([\-:\d]*)");
             var matches = regEx.Matches(currentLine);
             if (!matches.Any())
             {
@@ -122,9 +122,7 @@ namespace GitHubActionsDataCollector.Processors.JobProcessors
             
             var testName = matches[0].Groups[3].Value;
             var testDuration = matches[0].Groups[5].Value;
-            var testsTotal = matches[0].Groups[7].Value;
-            var testsPassed = matches[0].Groups[9].Value;
-            var testsFailed = matches[0].Groups[11].Value;
+            var testsFailed = matches[0].Groups[12].Value;
 
             if (!testName.Contains(".js") && !testName.Contains(".ts"))
             {
@@ -169,10 +167,9 @@ namespace GitHubActionsDataCollector.Processors.JobProcessors
                 var durationParts = durationString.Split(':').Select(x => int.Parse(x)).ToList();
                 duration = durationParts[0] * 60 * 1000 + durationParts[1] * 1000;
             }
-
-            if (durationString.EndsWith("ms"))
+            else // milliseconds only
             {
-                duration = int.Parse(durationString.Substring(0, durationString.Length - 3));
+                duration = int.Parse(durationString);
             }
 
             return duration;

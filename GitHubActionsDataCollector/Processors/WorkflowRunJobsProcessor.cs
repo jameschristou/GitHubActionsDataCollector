@@ -1,15 +1,11 @@
 ﻿using GitHubActionsDataCollector.GitHubActionsApi;
 using GitHubActionsDataCollector.Entities;
-using GitHubActionsDataCollector.Repositories;
-using System.IO.Compression;
-using System.Xml.Linq;
-using GitHubActionsDataCollector.Services;
 
 namespace GitHubActionsDataCollector.Processors
 {
     public interface IWorkflowRunJobsProcessor
     {
-        public Task<List<WorkflowRunJob>> Process(string repoOwner, string repoName, string token, WorkflowRun workflowRun);
+        public Task<List<WorkflowRunJob>> Process(string repoOwner, string repoName, string token, WorkflowRun workflowRun, WorkflowRunSettings runSettings);
     }
 
     internal class WorkflowRunJobsProcessor : IWorkflowRunJobsProcessor
@@ -24,7 +20,7 @@ namespace GitHubActionsDataCollector.Processors
             _workflowRunJobProcessor = workflowRunJobProcessor;
         }
 
-        public async Task<List<WorkflowRunJob>> Process(string repoOwner, string repoName, string token, WorkflowRun workflowRun)
+        public async Task<List<WorkflowRunJob>> Process(string repoOwner, string repoName, string token, WorkflowRun workflowRun, WorkflowRunSettings runSettings)
         {
             // we need to get the archive files for this run. they might be needed in job processing
             var artifactFiles = await _gitHubActionsApiClient.GetArtifactsListforWorkflowRun(repoOwner, repoName, token, workflowRun.RunId);
@@ -78,7 +74,7 @@ namespace GitHubActionsDataCollector.Processors
 
                     Console.WriteLine($"Found new job: {jobKey}");
 
-                    await _workflowRunJobProcessor.Process(repoOwner, repoName, token, workflowRunJob, artifactFiles);
+                    await _workflowRunJobProcessor.Process(repoOwner, repoName, token, workflowRunJob, artifactFiles, runSettings);
 
                     workflowJobs.Add(workflowRunJob);
                 }

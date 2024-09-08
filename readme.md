@@ -28,28 +28,34 @@ Drive the workflows to process from a SQL table and enable the process to restar
 * Some runs which are not complete will time out and the updated date for the run is updated at this point. It would be better to use the run start time and the completed time of the last non skipped job to determine the completion time of the run rather than updated date. (DONE)
 * Add audit date columns onto the WorkflowRun table to help track of when processing occurred (DONE)
 
-## Phase 6 - IN PROGRESS
+## Phase 6 - DONE
 We start interrogating the workflow run logs to get details on test results. We make this flexible so people can write their own custom log processor
 * Add XUnit tests (DONE)
 * Run the unit tests in the workflow for GitHubActionsDataCollector (DONE)
 * Add the ability to record individual test results (status, duration, error messages, etc) (DONE)
 * Extract and record test results for XUnit tests (DONE)
 * Extract and record test results for Cypress tests (DONE)
+
+## Phase 7 - IN PROGRESS
+Configurability. Make the following configurable so this can work as a solution for more use cases:
+* Have config for determining which jobs indicate the workflow has succeeded even if the workflows Conclusion is failed (DONE)
+* Move token into config (DONE)
 * Have config to determine which steps are tests and which job processor to run on them
 
-## Phase 7 - Reporting & Dashboards
+## Phase 8 - Reporting & Dashboards
 * Create some basic SQL scripts to get reports (DONE)
 * Export data to somewhere like Google Sheet
 * Create dashboard view from data
 
-## Phase 8
+## Phase 9
 Introduce job groups for grouping related jobs. Job groups should also have duration and conclusion info
 * Introduce job groups - grouping could be configured through regex on job name
 * Each run has job groups and each job belongs to a job group (is this true in simple workflows??)
 
-## Phase 9
+## Phase 10
 Look at defending against exceeding Github API limits
 * Because of (GHA API usage limits)[https://docs.github.com/en/actions/administering-github-actions/usage-limits-billing-and-administration] we want to make sure we limit how many calls are made in an hour. The X-RateLimit-Remaining response header could be useful.
 
-## Phase 10
+## Phase 11
 Set this up to run as a container in AWS Lambda on a regular schedule
+

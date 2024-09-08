@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace GitHubActionsDataCollector.Entities
 {
@@ -26,10 +27,12 @@ namespace GitHubActionsDataCollector.Entities
                 }
                 else
                 {
-                    _workflowRunSettings = JsonSerializer.Deserialize<WorkflowRunSettings>(_settings, new JsonSerializerOptions
+                    var options = new JsonSerializerOptions
                     {
                         PropertyNameCaseInsensitive = true
-                    });
+                    };
+                    options.Converters.Add(new JsonStringEnumConverter());
+                    _workflowRunSettings = JsonSerializer.Deserialize<WorkflowRunSettings>(_settings, options);
                 }
             }
         }

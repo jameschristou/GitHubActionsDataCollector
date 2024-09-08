@@ -40,9 +40,15 @@ IHostBuilder CreateHostBuilder(string[] strings)
             services.AddTransient<IWorkflowRunJobsProcessor, WorkflowRunJobsProcessor>();
             services.AddTransient<IWorkflowRunJobProcessor, WorkflowRunJobProcessor>();
             services.AddSingleton<IWorkflowRunLogsService, WorkflowRunLogsService>();  // TODO: for now register as singleton but need to improve this for memory management
+
+            // job processing services
             services.AddTransient<DotNetXmlTestResultsProcessor>();
             services.AddTransient<CypressTestResultsProcessor>();
             services.AddTransient<JobProcessorFactory>();
+            services.AddSingleton<IJobProcessorMatchingService, JobProcessorMatchingService>();
+            services.AddSingleton<RegExMatchProvider>();
+            services.AddSingleton<ExactMatchProvider>();
+
             services.AddTransient<IWorkflowRunRepository, WorkflowRunRepository>();
             services.AddTransient<IWorkflowRunJobsRepository, WorkflowRunJobsRepository>();
             services.AddTransient<IRegisteredWorkflowRepository, RegisteredWorkflowRepository>();

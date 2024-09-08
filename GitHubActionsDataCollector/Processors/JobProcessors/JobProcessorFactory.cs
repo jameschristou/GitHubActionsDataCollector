@@ -1,36 +1,26 @@
 ﻿using GitHubActionsDataCollector.Entities;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace GitHubActionsDataCollector.Processors.JobProcessors
 {
     public class JobProcessorFactory
     {
         private readonly IServiceProvider _serviceProvider;
+        private readonly IJobProcessorMatchingService _jobProcessorMatchingService;
 
-        public JobProcessorFactory(IServiceProvider serviceProvider)
+        public JobProcessorFactory(IServiceProvider serviceProvider,
+                                    IJobProcessorMatchingService jobProcessorMatchingService)
         {
             _serviceProvider = serviceProvider;
+            _jobProcessorMatchingService = jobProcessorMatchingService;
         }
 
-        public IJobProcessor Create(WorkflowRunJob job)
+        public IJobProcessor Create(WorkflowRunJob job, WorkflowRunSettings runSettings)
         {
-            if (DotNetXmlTestResultsProcessor.CanProcessJob(job))
-            {
-                return GetService<DotNetXmlTestResultsProcessor>();
-            }
+            var processingType = _jobProcessorMatchingService.GetMatchingJobProcessor(job.Name, runSettings);
 
-            if (CypressTestResultsProcessor.CanProcessJob(job))
-            {
-                return GetService<CypressTestResultsProcessor>();
-            }
+            if (processingType == null) return null;
 
-            return null;
-        }
-
-        private T GetService<T>()
-        {
-            // need to make sure we resolve using the current scope because some of the services 
-            return _serviceProvider.GetService<T>();
+            return (IJobProcessor)_serviceProvider.GetService(processingType);
         }
     }
 }

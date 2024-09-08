@@ -47,7 +47,7 @@ namespace GitHubActionsDataCollector.UnitTests
         public async Task WorkflowRunIsMarkedAsSuccess_WhenConclusionIsSuccessAndThereAreJobsToProcess()
         {
             var workflowRunJobsProcessor = Substitute.For<IWorkflowRunJobsProcessor>();
-            workflowRunJobsProcessor.Process(default, default, default, default).ReturnsForAnyArgs(x => new List<WorkflowRunJob> { new WorkflowRunJob { Conclusion = "success" } });
+            workflowRunJobsProcessor.Process(default, default, default, default, default).ReturnsForAnyArgs(x => new List<WorkflowRunJob> { new WorkflowRunJob { Conclusion = "success" } });
 
             var workflowRunRepository = Substitute.For<IWorkflowRunRepository>();
 
@@ -80,7 +80,7 @@ namespace GitHubActionsDataCollector.UnitTests
 
             var workflowRunJobsProcessor = Substitute.For<IWorkflowRunJobsProcessor>();
             var workflowRunRepository = Substitute.For<IWorkflowRunRepository>();
-            workflowRunJobsProcessor.Process(default, default, default, default).ReturnsForAnyArgs(x => new List<WorkflowRunJob> { new WorkflowRunJob { Name = jobNameForSuccess, Conclusion = "success" } });
+            workflowRunJobsProcessor.Process(default, default, default, default, default).ReturnsForAnyArgs(x => new List<WorkflowRunJob> { new WorkflowRunJob { Name = jobNameForSuccess, Conclusion = "success" } });
 
             var registeredWorkflowSettings = new WorkflowRunSettings()
             {
@@ -112,7 +112,7 @@ namespace GitHubActionsDataCollector.UnitTests
         {
             var workflowRunJobsProcessor = Substitute.For<IWorkflowRunJobsProcessor>();
             var workflowRunRepository = Substitute.For<IWorkflowRunRepository>();
-            workflowRunJobsProcessor.Process(default, default, default, default).ReturnsForAnyArgs(x => new List<WorkflowRunJob>());
+            workflowRunJobsProcessor.Process(default, default, default, default, default).ReturnsForAnyArgs(x => new List<WorkflowRunJob>());
 
             var registeredWorkflowSettings = new WorkflowRunSettings()
             {

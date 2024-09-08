@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GitHubActionsDataCollector
+﻿namespace GitHubActionsDataCollector
 {
     public class WorkflowRunSettings
     {
@@ -14,13 +8,19 @@ namespace GitHubActionsDataCollector
         // leave this blank to just rely on the run conclusion
         public string JobNameRequiredForRunSuccess { get; set; }
 
-        public List<JobProcessing> JobProcessingSettings { get; set; }
+        public List<JobProcessingSetting> JobProcessingSettings { get; set; }
     }
 
-    public class JobProcessing
+    public class JobProcessingSetting
     {
-        public string JobName { get; set; }
-        public string JobNameRegex { get; set; }
+        public JobProcessingMatchingType MatchingType { get; set; }
+        public string MatchString { get; set; }
         public string ProcessorName { get; set; }
+    }
+
+    public enum JobProcessingMatchingType
+    {
+        Regex,
+        Exact
     }
 }

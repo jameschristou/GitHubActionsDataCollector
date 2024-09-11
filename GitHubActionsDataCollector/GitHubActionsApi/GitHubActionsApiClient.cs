@@ -1,5 +1,7 @@
-﻿using System.Globalization;
+﻿using NHibernate.Mapping;
+using System.Globalization;
 using System.Net.Http.Headers;
+using System.Reflection.PortableExecutable;
 using System.Text.Json;
 
 namespace GitHubActionsDataCollector.GitHubActionsApi
@@ -17,6 +19,7 @@ namespace GitHubActionsDataCollector.GitHubActionsApi
     {
         private static string baseUrl = "https://api.github.com";
         private readonly HttpClient _httpClient;
+        private readonly int RateLimitMaxPercentageUsed = 50; // 50%
 
         public GitHubActionsApiClient(HttpClient httpClient)
         {
@@ -35,7 +38,7 @@ namespace GitHubActionsDataCollector.GitHubActionsApi
             // [Get workflow runs for a workflow](https://docs.github.com/en/rest/actions/workflow-runs?apiVersion=2022-11-28#list-workflow-runs-for-a-workflow)
             var url = $"{baseUrl}/repos/{owner}/{repo}/actions/workflows/{workflowId}/runs?per_page={resultsPerPage}&page={pageNumber}&created={fromDateFormatted}..{toDateFormatted}";
 
-            var response = await _httpClient.SendAsync(BuildRequest(url, token));
+            var response = await SendRequestAsync(url, token);
 
             if (response == null || !response.IsSuccessStatusCode)
             {
@@ -72,7 +75,7 @@ namespace GitHubActionsDataCollector.GitHubActionsApi
             // [List jobs for a workflow run](https://docs.github.com/en/rest/actions/workflow-jobs?apiVersion=2022-11-28#list-jobs-for-a-workflow-run)
             var url = $"{baseUrl}/repos/{owner}/{repo}/actions/runs/{workflowRunId}/jobs?per_page={resultsPerPage}&page={pageNumber}&filter=all";
 
-            var response = await _httpClient.SendAsync(BuildRequest(url, token));
+            var response = await SendRequestAsync(url, token);
 
             if (response == null || !response.IsSuccessStatusCode)
             {
@@ -88,7 +91,7 @@ namespace GitHubActionsDataCollector.GitHubActionsApi
             // [List artifacts for a workflow run](// [List jobs for a workflow run](https://docs.github.com/en/rest/actions/workflow-jobs?apiVersion=2022-11-28#list-jobs-for-a-workflow-run)
             var url = $"{baseUrl}/repos/{owner}/{repo}/actions/runs/{workflowRunId}/artifacts?per_page=100&page=1";
 
-            var response = await _httpClient.SendAsync(BuildRequest(url, token));
+            var response = await SendRequestAsync(url, token);
 
             if (response == null || !response.IsSuccessStatusCode)
             {
@@ -103,7 +106,7 @@ namespace GitHubActionsDataCollector.GitHubActionsApi
             // [Get download URL for an artifact](// [Download an artifact](https://docs.github.com/en/rest/actions/artifacts?apiVersion=2022-11-28#download-an-artifact)
             var url = $"{baseUrl}/repos/{owner}/{repo}/actions/artifacts/{artifactId}/zip";
 
-            var response = await _httpClient.SendAsync(BuildRequest(url, token));
+            var response = await SendRequestAsync(url, token);
 
             if (response == null || response.StatusCode != System.Net.HttpStatusCode.OK)
             {
@@ -118,7 +121,7 @@ namespace GitHubActionsDataCollector.GitHubActionsApi
             // [Download run attempt logs](https://docs.github.com/en/rest/actions/workflow-runs?apiVersion=2022-11-28#download-workflow-run-attempt-logs)
             var url = $"{baseUrl}/repos/{owner}/{repo}/actions/runs/{workflowRunId}/attempts/{attemptNumber}/logs";
 
-            var response = await _httpClient.SendAsync(BuildRequest(url, token));
+            var response = await SendRequestAsync(url, token);
 
             if (response == null || response.StatusCode != System.Net.HttpStatusCode.OK)
             {
@@ -126,6 +129,42 @@ namespace GitHubActionsDataCollector.GitHubActionsApi
             }
 
             return await response.Content.ReadAsStreamAsync();
+        }
+
+        private async Task<HttpResponseMessage> SendRequestAsync(string url, string token)
+        {
+            var response = await _httpClient.SendAsync(BuildRequest(url, token));
+
+            // validate that we are not exceeding the rate limit cap...however not all requests return
+            // the headers required so we can't assume these can be checked on every request
+            if (response == null) return null;
+
+            IEnumerable<string> values;
+            var rateLimitRemaining = 0;
+            var rateLimit = 0;
+
+            if (response.Headers.TryGetValues("x-ratelimit-limit", out values))
+            {
+                if (!int.TryParse(values.First(), out rateLimit))
+                {
+                    throw new Exception("Unable to check rate limit remaining");
+                }
+            }
+
+            if (response.Headers.TryGetValues("x-ratelimit-remaining", out values))
+            {
+                if (!int.TryParse(values.First(), out rateLimitRemaining))
+                {
+                    throw new Exception("Unable to check rate limit remaining");
+                }
+            }
+
+            if (rateLimitRemaining != 0 && rateLimit != 0 && ((rateLimitRemaining*100/rateLimit) < RateLimitMaxPercentageUsed))
+            {
+                throw new Exception("Rate limit cap exceeded. Cannot process any more requests until the current window resets");
+            }
+
+            return response;
         }
     }
 }

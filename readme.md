@@ -36,26 +36,25 @@ We start interrogating the workflow run logs to get details on test results. We 
 * Extract and record test results for XUnit tests (DONE)
 * Extract and record test results for Cypress tests (DONE)
 
-## Phase 7 - IN PROGRESS
+## Phase 7 - DONE
 Configurability. Make the following configurable so this can work as a solution for more use cases:
 * Have config for determining which jobs indicate the workflow has succeeded even if the workflows Conclusion is failed (DONE)
 * Move token into config (DONE)
-* Have config to determine which steps are tests and which job processor to run on them
+* Have config to determine which steps are tests and which job processor to run on them (DONE)
 
-## Phase 8 - Reporting & Dashboards
+## Phase 8 - DONE
+Look at defending against exceeding Github API limits
+* Because of (GHA API usage limits)[https://docs.github.com/en/actions/administering-github-actions/usage-limits-billing-and-administration] we want to make sure we limit how many calls are made in an hour. The X-RateLimit-Remaining response header could be useful. (DONE)
+
+## Phase 9 - Reporting & Dashboards
 * Create some basic SQL scripts to get reports (DONE)
 * Export data to somewhere like Google Sheet
 * Create dashboard view from data
 
-## Phase 9
+## Phase 10
 Introduce job groups for grouping related jobs. Job groups should also have duration and conclusion info
 * Introduce job groups - grouping could be configured through regex on job name
 * Each run has job groups and each job belongs to a job group (is this true in simple workflows??)
 
-## Phase 10
-Look at defending against exceeding Github API limits
-* Because of (GHA API usage limits)[https://docs.github.com/en/actions/administering-github-actions/usage-limits-billing-and-administration] we want to make sure we limit how many calls are made in an hour. The X-RateLimit-Remaining response header could be useful.
-
 ## Phase 11
 Set this up to run as a container in AWS Lambda on a regular schedule
-

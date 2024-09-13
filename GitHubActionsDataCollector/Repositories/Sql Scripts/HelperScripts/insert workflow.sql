@@ -1,11 +1,14 @@
+USE GHAData
+GO
+
 INSERT INTO dbo.RegisteredWorkflow (
     Owner,
     Repo,
     WorkflowId,
     WorkflowName,
-    Token,
     LastCheckedAtUtc,
-	ProcessedUntilUtc
+	ProcessedUntilUtc,
+	Settings
 )
 VALUES
 (
@@ -15,5 +18,15 @@ VALUES
 	'build',
 	'',
 	GETUTCDATE(),
-	'2024-07-01'
+	'{
+    "token": "your_token",
+    "jobNameRequiredForRunSuccess": "build",
+    "jobProcessingSettings":[
+        {
+            "matchingType": "Regex",
+            "matchString": "Test",
+            "processorName": "DotNetXmlTestResultsProcessor"
+        }
+    ]
+}'
 )

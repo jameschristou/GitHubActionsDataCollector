@@ -12,6 +12,7 @@ Each workflow you wish to collect data on needs a record in the `RegisteredWorkf
 If the workflow is for a private repository, you will need to provide a [GitHub personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic) in the Settings column. See the SQL script [insert workflow.sql](GitHubActionsDataCollector/Repositories/Sql%20Scripts/HelperScripts/insert%20workflow.sql) for an example of how to do this.
 
 | Column Name | Example |
+|-------------|---------|
 | Owner | `jameschristou` in https://github.com/jameschristou/GitHubActionsDataCollector/actions/workflows/build.yml |
 | Repo | `GitHubActionsDataCollector` in https://github.com/jameschristou/GitHubActionsDataCollector/actions/workflows/build.yml |
 | WorkflowId | Numerical id for the workflow. This can be obtained using https://docs.github.com/en/rest/actions/workflows?apiVersion=2022-11-28#get-a-workflow. With this endpoint use build.yml as the workflow_id and it will return data about the workflow, including the numeric workflowid. |

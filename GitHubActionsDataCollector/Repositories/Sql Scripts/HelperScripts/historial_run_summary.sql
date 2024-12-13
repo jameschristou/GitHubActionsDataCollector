@@ -11,7 +11,7 @@ WITH runs AS (
 			DATEDIFF(minute, StartedAtUtc, CompletedAtUtc) AS DurationMinutes,
 			NumAttempts,
 			Conclusion,
-			DATEADD(day, - (DATEDIFF(day, StartedAtUtc, @reportEndDate)/@numDaysInDateRange)*@numDaysInDateRange, @reportEndDate) AS DateGroup
+			DATEADD(day, - (DATEDIFF(hour, StartedAtUtc, @reportEndDate)/(@numDaysInDateRange*24))*@numDaysInDateRange, @reportEndDate) AS DateGroup
 	FROM	[GHAData].[dbo].[WorkflowRun]
 	WHERE	Conclusion in ('success', 'failure') AND StartedAtUtc < @reportEndDate
 ),

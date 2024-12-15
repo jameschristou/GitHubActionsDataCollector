@@ -34,7 +34,7 @@ namespace GitHubActionsDataCollector.Processors
             // we add one second to avoid retrieving the last processed workflow again
             var fromDate = registeredWorkflow.ProcessedUntilUtc.AddSeconds(1);
             var toDate = fromDate.AddHours(SearchWindowInHours);
-            var processedUntilDate = toDate;
+            var processedUntilDate = toDate < DateTime.UtcNow ? toDate : DateTime.UtcNow;
 
             do
             {

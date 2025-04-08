@@ -78,7 +78,7 @@ namespace GitHubActionsDataCollector.Processors.JobProcessors
         private static string GetCategoryName(WorkflowRunJob job)
         {
             // we get this through the job name
-            var regEx = new Regex(@"API regression test \(([^,]*),");
+            var regEx = job.Name.Contains("API regression test", StringComparison.InvariantCultureIgnoreCase) ? new Regex(@"API regression test \(([^,]*),") : new Regex(@"API \(([^\)]*)\)");
             var matches = regEx.Matches(job.Name);
             if (matches.Any())
             {

@@ -72,7 +72,7 @@ namespace GitHubActionsDataCollector.Services
 
         private string GetArchiveEntryPrefix(WorkflowRunJob job)
         {
-            return job.Name.Replace("/", "");
+            return $"{job.Name.Replace("/", "")}/";
         }
 
         private string GetArchiveEntrySuffix(WorkflowRunJob job)

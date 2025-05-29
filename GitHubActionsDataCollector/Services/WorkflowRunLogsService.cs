@@ -36,6 +36,7 @@ namespace GitHubActionsDataCollector.Services
 
             if(archiveEntries == null || archiveEntries.Count() == 0)
             {
+                // Integration _ Smoke Test _ CypressSmoke AU-1.txt
                 //Regression1 migrate and test  Run smoke and regression tests Smoke Test Cypress Smoke Te(2)/ 4_Checkout.txt
                 //Regression1 migrate and test / Run smoke and regression tests / Smoke Test / Cypress Smoke Test (en-AU, au-tests., 2)
 
@@ -72,17 +73,12 @@ namespace GitHubActionsDataCollector.Services
 
         private string GetArchiveEntryPrefix(WorkflowRunJob job)
         {
-            return $"{job.Name.Replace("/", "")}/";
+            return string.Empty;
         }
 
         private string GetArchiveEntrySuffix(WorkflowRunJob job)
         {
-            if(job.Name.Contains("cypress", StringComparison.InvariantCultureIgnoreCase))
-            {
-                return "_Run Cypress";
-            }
-
-            return string.Empty;
+            return $"{job.Name.Replace("/", "_")}.txt";
         }
 
         // TODO: this assumes lifetime of this object will be per run

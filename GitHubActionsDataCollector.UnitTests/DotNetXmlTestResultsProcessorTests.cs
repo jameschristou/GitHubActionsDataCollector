@@ -19,6 +19,15 @@ namespace GitHubActionsDataCollector.UnitTests
         }
 
         [Fact]
+        public void CanProcessJob_ReturnsTrue_ForApiRegressionTestJob_LatestFormat_SmokeTest()
+        {
+            Assert.True(DotNetXmlTestResultsProcessor.CanProcessJob(new WorkflowRunJob
+            {
+                Name = "Integration / Run smoke and regression tests / Regression Test / API (SmokeTest)"
+            }));
+        }
+
+        [Fact]
         public void CanProcessJob_ReturnsFalse_ForNonApiRegressionTestJob()
         {
             Assert.False(DotNetXmlTestResultsProcessor.CanProcessJob(new WorkflowRunJob

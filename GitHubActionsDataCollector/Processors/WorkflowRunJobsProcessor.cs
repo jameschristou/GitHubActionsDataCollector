@@ -57,26 +57,33 @@ namespace GitHubActionsDataCollector.Processors
                     // don't add again if we've seen this job before
                     if (jobIndex.ContainsKey(jobKey)) continue;
 
-                    var workflowRunJob = new WorkflowRunJob
+                    try
                     {
-                        RunId = job.run_id,
-                        JobId = job.id,
-                        RunAttempt = job.run_attempt,
-                        Name = job.name,
-                        Conclusion = job.conclusion,
-                        Url = job.html_url,
-                        StartedAtUtc = DateTime.Parse(job.started_at, null, System.Globalization.DateTimeStyles.RoundtripKind),
-                        CompletedAtUtc = DateTime.Parse(job.completed_at, null, System.Globalization.DateTimeStyles.RoundtripKind),
-                        WorkflowRun = workflowRun
-                    };
+                        var workflowRunJob = new WorkflowRunJob
+                        {
+                            RunId = job.run_id,
+                            JobId = job.id,
+                            RunAttempt = job.run_attempt,
+                            Name = job.name,
+                            Conclusion = job.conclusion,
+                            Url = job.html_url,
+                            StartedAtUtc = DateTime.Parse(job.started_at, null, System.Globalization.DateTimeStyles.RoundtripKind),
+                            CompletedAtUtc = DateTime.Parse(job.completed_at, null, System.Globalization.DateTimeStyles.RoundtripKind),
+                            WorkflowRun = workflowRun
+                        };
 
-                    jobIndex.Add(jobKey, job.id);
+                        jobIndex.Add(jobKey, job.id);
 
-                    Console.WriteLine($"Found new job: {jobKey}");
+                        Console.WriteLine($"Found new job: {jobKey}");
 
-                    await _workflowRunJobProcessor.Process(repoOwner, repoName, token, workflowRunJob, artifactFiles, runSettings);
+                        await _workflowRunJobProcessor.Process(repoOwner, repoName, token, workflowRunJob, artifactFiles, runSettings);
 
-                    workflowJobs.Add(workflowRunJob);
+                        workflowJobs.Add(workflowRunJob);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.ToString());
+                    }
                 }
             }
             while (pageNumber * resultsPerPage < totalResults);
@@ -94,7 +101,8 @@ namespace GitHubActionsDataCollector.Processors
         private bool ShouldProcessJob(WorkflowRunJobDto job)
         {
             if (string.Equals("skipped", job.conclusion, StringComparison.OrdinalIgnoreCase)
-                || string.Equals("cancelled", job.conclusion, StringComparison.OrdinalIgnoreCase))
+                || string.Equals("cancelled", job.conclusion, StringComparison.OrdinalIgnoreCase)
+                || job.completed_at == null)
                 return false;
 
             return true;

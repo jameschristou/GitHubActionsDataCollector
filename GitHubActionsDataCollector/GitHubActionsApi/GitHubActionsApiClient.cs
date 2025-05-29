@@ -24,6 +24,7 @@ namespace GitHubActionsDataCollector.GitHubActionsApi
         public GitHubActionsApiClient(HttpClient httpClient)
         {
             _httpClient = httpClient;
+            _httpClient.Timeout = TimeSpan.FromSeconds(240); // set a timeout for the http client
         }
 
         /// <summary>
